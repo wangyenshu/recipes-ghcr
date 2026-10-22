@@ -5,7 +5,7 @@
 
 - **[QuantStack](https://quantstack.net/)**: sponsors continued development and maintenance.
 - **[Bloomberg](https://www.bloomberg.com/)**: sponsors continued development and maintenance.
-- **[prefix.dev](https://prefix.dev/)**: hosts the emscripten-forge package channel.
+- **[prefix.dev](https://prefix.dev/)**: hosted the emscripten-forge package channel before it moved to the GitHub Container Registry.
 
 ## Contributors
 

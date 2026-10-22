@@ -45,32 +45,64 @@ jobs:
       ################################################################
       # UPLOAD
       ################################################################
-      - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v5
+      - name: Upload docs artifact
+        uses: actions/upload-artifact@v7
         with:
+          name: docs-html
           path: docs/_build/html/
 
   deploy:
-    # only run on main branch
-    if: github.ref == 'refs/heads/main' && github.repository == 'emscripten-forge/recipes'
-
-    # Add a dependency to the build job
+    # only publish from main, never from pull requests
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
     needs: build_docs
-
-    # Grant GITHUB_TOKEN the permissions required to make a Pages deployment
-    permissions:
-      contents: read    # to read the Pages artifact
-      pages: write      # to deploy to Pages
-      id-token: write   # to verify the deployment originates from an appropriate source
-
-    # Deploy to the github-pages environment
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-
-    # Specify runner + deployment step
     runs-on: ubuntu-latest
+
+    permissions:
+      contents: write   # to push the gh-pages branch
+
+    # one publish at a time, so two pushes to gh-pages don't race
+    concurrency:
+      group: gh-pages
+      cancel-in-progress: false
+
     steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v5 # or specific "vX.X.X" version tag for this action
+      - name: Download docs artifact
+        uses: actions/download-artifact@v8
+        with:
+          name: docs-html
+          path: site
+
+      - name: Publish to the gh-pages branch
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          SITE="$GITHUB_WORKSPACE/site"
+          DEST="$RUNNER_TEMP/gh-pages"
+          REMOTE="https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+
+          # reuse the branch if it exists, otherwise create it (no history from main)
+          if git ls-remote --exit-code --heads "$REMOTE" gh-pages > /dev/null; then
+            git clone --quiet --depth 1 --branch gh-pages "$REMOTE" "$DEST"
+          else
+            echo "gh-pages branch not found, creating it"
+            git init --quiet --initial-branch gh-pages "$DEST"
+            git -C "$DEST" remote add origin "$REMOTE"
+          fi
+
+          # replace the site, keep the branch history
+          find "$DEST" -mindepth 1 -maxdepth 1 ! -name .git -exec rm -rf {} +
+          cp -a "$SITE"/. "$DEST"/
+          touch "$DEST/.nojekyll"   # serve the Sphinx _static/ folders as-is
+
+          cd "$DEST"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "Docs unchanged, nothing to publish"
+            exit 0
+          fi
+          git commit --quiet -m "Publish docs from ${GITHUB_SHA}"
+          git push --quiet origin gh-pages
+          echo "Published to the gh-pages branch of ${GITHUB_REPOSITORY}"

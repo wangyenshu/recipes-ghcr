@@ -12,7 +12,9 @@ on:
 
 permissions:
   contents: read
-  id-token: write
+  id-token: write      # signing the provenance attestations
+  attestations: write  # storing them on GitHub
+  packages: write      # pushing to ghcr.io with GITHUB_TOKEN
 
 jobs:
 
@@ -117,13 +119,20 @@ jobs:
           path: output
         continue-on-error: true
 
-      - name: Upload packages to prefix channel
+      - name: Install oras
         if: (github.event_name == 'push' && github.repository == 'emscripten-forge/recipes')
-        shell: bash -l {0}
-        run: |
+        uses: oras-project/setup-oras@v2
 
-          # add github workspace to python path
-          export PYTHONPATH="${GITHUB_WORKSPACE}:${PYTHONPATH}"
+      - name: Log in to ghcr.io
+        if: (github.event_name == 'push' && github.repository == 'emscripten-forge/recipes')
+        shell: bash
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | oras login ghcr.io -u "${{ github.actor }}" --password-stdin
+
+      - name: Upload packages to ghcr.io
+        id: upload
+        if: (github.event_name == 'push' && github.repository == 'emscripten-forge/recipes')
+        shell: bash -el {0}
+        run: |
           case "$(uname -s)" in
               Darwin)
                   # macOS: only upload osx-arm64
@@ -138,44 +147,20 @@ jobs:
                   exit 1
                   ;;
           esac
-          overall_success=true
+          args=()
           for platform in "${platforms[@]}"; do
-            if [ -d "${GITHUB_WORKSPACE}/output/${platform}" ]; then
-              cd "${GITHUB_WORKSPACE}/output/${platform}"
-              files=$(ls *.tar.bz2 2> /dev/null)
-              if [ -n "$files" ]; then
-                for package in $files; do
-
-                  # get the channel
-                  CHANNEL=$(python -m emci upload extract-channel ${package})
-                  echo "Extracted channel: ${CHANNEL}"
-
-                  echo "Uploading ${package} for ${platform}"
-
-                  rattler-build upload prefix \
-                    --channel ${CHANNEL} \
-                    --generate-attestation \
-                    ${package}
-
-                  RETURNCODE=$?
-
-                  # Check the RETURN CODE
-                  if [[ $RETURNCODE -eq 0 ]]; then
-                    echo "Upload succeeded for ${package} on ${platform}"
-                  else
-                    echo "Error: Upload failed with HTTP status $HTTP_STATUS"
-                    echo "Response Body: $RESPONSE"
-                    overall_success=false
-                  fi
-                done
-              fi
-            fi
+            args+=(--platform "$platform")
           done
 
-          # Check if all uploads were successful
-          if [ "$overall_success" = false ]; then
-            echo "One or more uploads failed"
-            exit 1
-          else
-            echo "All uploads completed successfully"
-          fi
+          # pushes each package to ghcr.io/<owner>/<channel>/<subdir>/<name>:<version>-<build>
+          # and adds it to ghcr.io/<owner>/<channel>/<subdir>/repodata.json:latest
+          python -m emci upload ghcr "${GITHUB_WORKSPACE}/output" "${args[@]}" \
+            --registry "ghcr.io/${GITHUB_OWNER}" \
+            --source-url "${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}"
+
+      # replaces `rattler-build upload prefix --generate-attestation`
+      - name: Attest package provenance
+        if: ${{ !cancelled() && steps.upload.outputs.pushed != '' }}
+        uses: actions/attest@v4
+        with:
+          subject-path: ${{ steps.upload.outputs.pushed }}

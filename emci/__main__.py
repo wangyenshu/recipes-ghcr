@@ -15,7 +15,7 @@ import tempfile
 import shutil
 from pathlib import Path
 
-from typing import Optional
+from typing import List, Optional
 import typer
 
 app = typer.Typer(pretty_exceptions_enable=False)
@@ -29,6 +29,44 @@ app.add_typer(upload_app, name="upload")
 @upload_app.command()
 def extract_channel(pkg_file):
     print(extract_channel_from_pkg(pkg_file))
+
+
+@upload_app.command()
+def ghcr(
+    output_dir: str,
+    platform: List[str] = typer.Option(..., help="subdir of OUTPUT_DIR to publish, repeatable"),
+    registry: str = typer.Option("ghcr.io/emscripten-forge", help="registry namespace the channels live under"),
+    source_url: Optional[str] = typer.Option(None, help="repository URL to link the packages to"),
+    plain_http: bool = typer.Option(False, help="talk plain HTTP to the registry (local testing only)"),
+):
+    """Push the built packages to an OCI registry and update each channel's repodata.json."""
+    from .ghcr import ChannelPublisher
+
+    packages = []
+    for subdir in platform:
+        for pkg in sorted((Path(output_dir) / subdir).glob("*.tar.bz2")):
+            channel = extract_channel_from_pkg(str(pkg))
+            print(f"{pkg.name} -> channel {channel}")
+            packages.append((channel, pkg))
+
+    if not packages:
+        print("No packages to upload")
+        return
+
+    publisher = ChannelPublisher(registry, source_url=source_url, plain_http=plain_http)
+    pushed, failed = publisher.publish(packages)
+
+    github_output = os.environ.get("GITHUB_OUTPUT")
+    if github_output:
+        with open(github_output, "a") as f:
+            f.write("pushed<<EOF\n")
+            f.write("".join(f"{p}\n" for p in pushed))
+            f.write("EOF\n")
+
+    skipped = sum(1 for _, p in packages if p not in pushed and p not in failed)
+    print(f"{len(pushed)} pushed, {skipped} already published, {len(set(failed))} failed")
+    if failed:
+        raise typer.Exit(code=1)
 
 @build_app.command()
 def changed(
