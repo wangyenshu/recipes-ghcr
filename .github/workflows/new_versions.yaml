@@ -19,6 +19,8 @@ jobs:
       - uses: actions/checkout@v7
         with:
           ref: main
+          # push bump branches with the bot token, not the read-only GITHUB_TOKEN
+          token: ${{ secrets.BOT_ACCESS_TOKEN }}
 
       - name: Install micromamba
         uses: mamba-org/setup-micromamba@v3
