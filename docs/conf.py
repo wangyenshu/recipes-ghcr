@@ -15,7 +15,7 @@ extensions = [
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
 # Open Graph defaults
-ogp_site_url = "https://emscripten-forge.org/"
+ogp_site_url = "https://wangyenshu.github.io/recipes-ghcr/"
 ogp_site_name = project
 ogp_image = "_static/og_image.png"
 ogp_image_alt = "Emscripten-forge"
@@ -31,7 +31,7 @@ _OGP_DEFAULT_DESCRIPTION = (
 _OGP_PAGE_META = {
     "blog/posts/r_shiny": {
         "og:type": "article",
-        "og:image": "https://emscripten-forge.org/_static/og_image_r_shiny.png",
+        "og:image": "https://wangyenshu.github.io/recipes-ghcr/_static/og_image_r_shiny.png",
         "og:image:alt": "Emscripten-forge and Shiny",
         "og:description": (
             "Fully-static Shiny dashboards that run entirely in the browser with "
@@ -87,7 +87,7 @@ html_theme_options = {
         "text": project,
     },
     "navbar_persistent": [],
-    "repository_url": "https://github.com/emscripten-forge/recipes",
+    "repository_url": "https://github.com/wangyenshu/recipes-ghcr",
     "use_repository_button": True,
 }
 html_title = project

@@ -11,9 +11,9 @@ jobs:
   update_versions:
     strategy:
       matrix:
-        branch: [main, emscripten-6x]
+        branch: [main]  # this repo has no emscripten-6x branch
 
-    if: (github.event_name == 'schedule' && github.repository == 'emscripten-forge/recipes') || (github.event_name != 'schedule')
+    if: (github.event_name == 'schedule' && github.repository == 'wangyenshu/recipes-ghcr') || (github.event_name != 'schedule')
     runs-on: [ubuntu-latest]
     steps:
       - uses: actions/checkout@v7

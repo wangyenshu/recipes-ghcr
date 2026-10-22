@@ -35,7 +35,7 @@ def extract_channel(pkg_file):
 def ghcr(
     output_dir: str,
     platform: List[str] = typer.Option(..., help="subdir of OUTPUT_DIR to publish, repeatable"),
-    registry: str = typer.Option("ghcr.io/emscripten-forge", help="registry namespace the channels live under"),
+    registry: str = typer.Option("ghcr.io/wangyenshu", help="registry namespace the channels live under"),
     source_url: Optional[str] = typer.Option(None, help="repository URL to link the packages to"),
     plain_http: bool = typer.Option(False, help="talk plain HTTP to the registry (local testing only)"),
 ):

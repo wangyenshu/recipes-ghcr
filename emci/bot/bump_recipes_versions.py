@@ -282,7 +282,7 @@ def bump_recipe_versions(recipe_dir, pr_target_branch, use_bot=True, pr_limit=20
 
         command = [
             "gh", "pr", "list",
-            "--author", "emscripten-forge-bot",
+            "--author", "@me",  # whoever owns BOT_ACCESS_TOKEN
             "--base", pr_target_branch,
             "--json", "number,title",
             "--limit", "200" # default is only 30

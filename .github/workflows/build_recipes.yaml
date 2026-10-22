@@ -27,7 +27,7 @@ jobs:
     env:
       FORCE_COLOR: 1
       TARGET_PLATFORM: emscripten-wasm32
-      GITHUB_OWNER: "emscripten-forge"
+      GITHUB_OWNER: ${{ github.repository_owner }}
 
     steps:
       ################################################################
@@ -120,17 +120,17 @@ jobs:
         continue-on-error: true
 
       - name: Install oras
-        if: (github.event_name == 'push' && github.repository == 'emscripten-forge/recipes')
+        if: (github.event_name == 'push' && github.repository == 'wangyenshu/recipes-ghcr')
         uses: oras-project/setup-oras@v2
 
       - name: Log in to ghcr.io
-        if: (github.event_name == 'push' && github.repository == 'emscripten-forge/recipes')
+        if: (github.event_name == 'push' && github.repository == 'wangyenshu/recipes-ghcr')
         shell: bash
         run: echo "${{ secrets.GITHUB_TOKEN }}" | oras login ghcr.io -u "${{ github.actor }}" --password-stdin
 
       - name: Upload packages to ghcr.io
         id: upload
-        if: (github.event_name == 'push' && github.repository == 'emscripten-forge/recipes')
+        if: (github.event_name == 'push' && github.repository == 'wangyenshu/recipes-ghcr')
         shell: bash -el {0}
         run: |
           case "$(uname -s)" in
@@ -155,7 +155,7 @@ jobs:
           # pushes each package to ghcr.io/<owner>/<channel>/<subdir>/<name>:<version>-<build>
           # and adds it to ghcr.io/<owner>/<channel>/<subdir>/repodata.json:latest
           python -m emci upload ghcr "${GITHUB_WORKSPACE}/output" "${args[@]}" \
-            --registry "ghcr.io/${GITHUB_OWNER}" \
+            --registry "ghcr.io/$(echo "$GITHUB_OWNER" | tr "[:upper:]" "[:lower:]")" \
             --source-url "${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}"
 
       # replaces `rattler-build upload prefix --generate-attestation`

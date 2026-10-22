@@ -75,7 +75,7 @@ def update_matplotlib_fontcache(recipe_dir, target_branch_name):
             PREFIX_PATH,
             "--platform=emscripten-wasm32",
             "-c",
-            "oci://ghcr.io/emscripten-forge/emscripten-forge-4x",
+            "oci://ghcr.io/wangyenshu/emscripten-forge-4x",
             "-c",
             "conda-forge",
             f"matplotlib={matplotlib_version}",

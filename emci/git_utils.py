@@ -4,6 +4,9 @@ import json
 from contextlib import contextmanager
 from pathlib import Path
 
+# the repository the bot opens PRs in (set by GitHub Actions)
+THIS_REPO = os.environ.get("GITHUB_REPOSITORY", "wangyenshu/recipes-ghcr")
+
 def find_files_with_changes(old, new):
     # `origin/main...HEAD` shows the unique files changed in HEAD
     # and ignores changes in origin/main after the branch split
@@ -135,7 +138,7 @@ def make_pr(
     )
 
     subprocess.check_call(
-        ["gh", "repo", "set-default", "emscripten-forge/recipes"],
+        ["gh", "repo", "set-default", THIS_REPO],
         cwd=os.getcwd(),
     )
 
@@ -164,7 +167,7 @@ def make_pr_for_recipe(recipe_dir, pr_title, target_branch_name, branch_name, au
     subprocess.check_output(['git', 'push', '-u', 'origin', branch_name, "--force"])
 
     # gh set default repo
-    subprocess.check_call(['gh', 'repo', 'set-default', 'emscripten-forge/recipes'], cwd=os.getcwd())
+    subprocess.check_call(['gh', 'repo', 'set-default', THIS_REPO], cwd=os.getcwd())
 
 
     args = ['gh', 'pr', 'create',

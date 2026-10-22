@@ -1,7 +1,7 @@
 """Publish conda packages to an OCI registry such as ghcr.io.
 
 The layout matches what rattler (rattler-build, pixi, mamba via rattler) reads
-from an ``oci://`` channel, e.g. ``oci://ghcr.io/emscripten-forge/emscripten-forge-4x``:
+from an ``oci://`` channel, e.g. ``oci://ghcr.io/wangyenshu/emscripten-forge-4x``:
 
 * a package ``<name>-<version>-<build>.tar.bz2`` in ``<subdir>`` is the
   single layer (media type ``application/vnd.conda.package.v1``) of
