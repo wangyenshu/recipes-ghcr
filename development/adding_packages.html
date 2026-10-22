@@ -1,0 +1,660 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta property="og:title" content="Adding packages" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://emscripten-forge.org/development/adding_packages.html" />
+<meta property="og:site_name" content="Emscripten-forge" />
+<meta property="og:description" content="Conda packages and recipes for the emscripten-wasm32 and emscripten-wasm64 WebAssembly platforms." />
+<meta property="og:image" content="https://emscripten-forge.org/_static/og_image.png" />
+<meta property="og:image:alt" content="Emscripten-forge" />
+<meta name="description" content="To add a new package to emscripten-forge, just create a Pull Request in this repository. The recipe format is described in the rattler-build recipe format C/C++ Packages: CMake: Adding cmake based ..." />
+
+    <title>Adding packages &#8212; Emscripten-forge</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=4418a689" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=75cd5198" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../_static/scripts/fontawesome.js?digest=90905a2f556bf617f1a9"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
+
+    <script src="../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=fab101a9"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'development/adding_packages';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <link rel="icon" href="../_static/icon.svg"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Recipe format" href="recipe_format.html" />
+    <link rel="prev" title="Introduction" href="../index.html" /> 
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  
+    
+    <script src="../_static/searchtools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script src="../searchindex.js"></script>
+     
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/icon.svg" class="logo__image only-light" alt="Emscripten-forge logo"/>
+    <img src="../_static/icon.svg" class="logo__image only-dark pst-js-only" alt="Emscripten-forge logo"/>
+  
+  
+    <p class="title logo__title">Emscripten-forge</p>
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Adding packages</a></li>
+<li class="toctree-l1"><a class="reference internal" href="recipe_format.html">Recipe format</a></li>
+<li class="toctree-l1"><a class="reference internal" href="local_builds.html">Local builds</a></li>
+<li class="toctree-l1"><a class="reference internal" href="conda_build_config.html">Conda build config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="troubleshooting.html">Troubleshooting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="code_of_conduct.html">Code of Conduct</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Usage</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../usage/installing_packages.html">Installing packages</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage/jupyterlite.html">JupyterLite Xeus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage/package_server.html">Package Server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage/qtapp.html">Experimental Qt runner</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Project</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../blog/index.html">Blog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../project/get_involved.html">Get Involved</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../project/related_projects.html">Related Projects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../project/showcase.html">Showcase</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../project/faq.html">FAQ</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../project/credits.html">Credits</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+<a href="https://github.com/emscripten-forge/recipes" target="_blank"
+   class="btn btn-sm btn-source-repository-button"
+   title="Source repository"
+   data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+
+</a>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/development/adding_packages.md" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.md</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button pst-navbar-icon"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+  </ul>
+</div>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+<button class="sidebar-toggle secondary-toggle btn btn-sm pst-navbar-icon" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Adding packages</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#c-c-packages">C/C++ Packages</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#cmake">CMake</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#configure-make">Configure / Make</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#python-packages">Python Packages</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pip-setuptools">pip / setuptools</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#meson">meson</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#rust">rust</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#r-packages">R Packages</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                   <section id="adding-packages">
+<h1>Adding packages<a class="headerlink" href="#adding-packages" title="Link to this heading">#</a></h1>
+<p>To add a new package to emscripten-forge, just create a Pull Request in <a class="reference external" href="https://github.com/emscripten-forge/recipes/pulls">this repository</a>.
+The recipe format is described in the <a class="reference external" href="https://github.com/prefix-dev/rattler-build?tab=readme-ov-file#the-recipe-format">rattler-build recipe format</a></p>
+<section id="c-c-packages">
+<h2>C/C++ Packages<a class="headerlink" href="#c-c-packages" title="Link to this heading">#</a></h2>
+<section id="cmake">
+<h3>CMake<a class="headerlink" href="#cmake" title="Link to this heading">#</a></h3>
+<p>Adding cmake based packages is easy. Usually it is enough to replace the <code class="docutils literal notranslate"><span class="pre">cmake</span></code> command with the <code class="docutils literal notranslate"><span class="pre">emcmake</span></code> command and
+<code class="docutils literal notranslate"><span class="pre">make</span></code> with <code class="docutils literal notranslate"><span class="pre">emmake</span></code> (see the <a class="reference external" href="https://emscripten.org/docs/compiling/Building-Projects.html#integrating-with-a-build-system">emscripten documentation</a> for more details).</p>
+<p>To build a shared library with CMake, one needs  flags.
+These flags can be put into a <code class="docutils literal notranslate"><span class="pre">.cmake</span></code> file:</p>
+<div class="highlight-CMake notranslate"><div class="highlight"><pre><span></span><span class="c"># overwriteProp.cmake</span>
+<span class="nb">set_property</span><span class="p">(</span><span class="s">GLOBAL</span><span class="w"> </span><span class="s">PROPERTY</span><span class="w"> </span><span class="s">TARGET_SUPPORTS_SHARED_LIBS</span><span class="w"> </span><span class="s">TRUE</span><span class="p">)</span><span class="w"> </span><span class="c"># does not need to be global :)</span>
+<span class="nb">set</span><span class="p">(</span><span class="s">CMAKE_SHARED_LIBRARY_CREATE_C_FLAGS</span><span class="w"> </span><span class="s2">"-s SIDE_MODULE=1"</span><span class="p">)</span>
+<span class="nb">set</span><span class="p">(</span><span class="s">CMAKE_SHARED_LIBRARY_CREATE_CXX_FLAGS</span><span class="w"> </span><span class="s2">"-s SIDE_MODULE=1"</span><span class="p">)</span>
+<span class="nb">set</span><span class="p">(</span><span class="s">CMAKE_STRIP</span><span class="w"> </span><span class="s">FALSE</span><span class="p">)</span><span class="w">  </span><span class="c"># used by default in pybind11 on .so modules # only for needed when using pybind11</span>
+</pre></div>
+</div>
+<p>This can be passed to the as command line argument to cmake</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># CLI</span>
+<span class="o">...</span> <span class="o">-</span><span class="n">DCMAKE_PROJECT_INCLUDE</span><span class="o">=</span><span class="n">overwriteProp</span><span class="o">.</span><span class="n">cmake</span>
+</pre></div>
+</div>
+<p><strong>Example recipes</strong>:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/emscripten-forge/recipes/tree/main/recipes/recipes_emscripten/xeus">xeus</a></p></li>
+<li><p><a class="reference external" href="https://github.com/emscripten-forge/recipes/tree/main/recipes/recipes_emscripten/xeus-javascript">xeus-javascript</a></p></li>
+<li><p><a class="reference external" href="https://github.com/emscripten-forge/recipes/tree/main/recipes/recipes_emscripten/sqlitecpp">sqlitecpp</a></p></li>
+</ul>
+</section>
+<section id="configure-make">
+<h3>Configure / Make<a class="headerlink" href="#configure-make" title="Link to this heading">#</a></h3>
+<p>Usually it is enough to replace the <code class="docutils literal notranslate"><span class="pre">./configure</span></code> command with the <code class="docutils literal notranslate"><span class="pre">emconfigure</span> <span class="pre">./configure</span></code> (see the <a class="reference external" href="https://emscripten.org/docs/compiling/Building-Projects.html#integrating-with-a-build-system">emscripten documentation</a> for more details).</p>
+</section>
+</section>
+<section id="python-packages">
+<h2>Python Packages<a class="headerlink" href="#python-packages" title="Link to this heading">#</a></h2>
+<section id="pip-setuptools">
+<h3>pip / setuptools<a class="headerlink" href="#pip-setuptools" title="Link to this heading">#</a></h3>
+<p>For a simple package, only these requirements are usually necessary:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">requirements</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">build</span><span class="p">:</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">cross-python_${{ target_platform }}</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">${{ compiler("c") }}</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">pip</span>
+<span class="w">  </span><span class="nt">host</span><span class="p">:</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python</span>
+<span class="w">  </span><span class="nt">run</span><span class="p">:</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python</span>
+</pre></div>
+</div>
+<p><strong>Example recipes</strong>:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/emscripten-forge/recipes/tree/main/recipes/recipes_emscripten/regex">regex</a></p></li>
+</ul>
+</section>
+<section id="meson">
+<h3>meson<a class="headerlink" href="#meson" title="Link to this heading">#</a></h3>
+<p>For a meson package, the following requirements are usually needed.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">requirements</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">build</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">${{ compiler('cxx') }}</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">cross-python_${{target_platform}}</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">meson-python</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">pip &gt;=24</span>
+<span class="w">  </span><span class="nt">host</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python</span>
+</pre></div>
+</div>
+<p>Furthermore, an <code class="docutils literal notranslate"><span class="pre">emscripten.meson.cross</span></code> file is necessary to set the correct compiler and flags for cross compilation.</p>
+<div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span class="c1"># binaries section is at the end to be able to append the python binary.</span>
+
+<span class="k">[properties]</span>
+<span class="n">needs_exe_wrapper</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
+<span class="n">skip_sanity_check</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
+<span class="n">longdouble_format</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">'IEEE_QUAD_LE'</span><span class="w"> </span><span class="c1"># for numpy</span>
+
+<span class="k">[host_machine]</span>
+<span class="n">system</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">'emscripten'</span>
+<span class="n">cpu_family</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">'wasm32'</span>
+<span class="n">cpu</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">'wasm'</span>
+<span class="n">endian</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">'little'</span>
+
+<span class="k">[binaries]</span>
+<span class="n">exe_wrapper</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">'node'</span>
+<span class="n">pkgconfig</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">'pkg-config'</span>
+</pre></div>
+</div>
+<p>In the build script, we append the python binary to the <em>.cross</em> file and pass this <em>.cross</em> file to the pip command.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/bin/bash</span>
+
+cp<span class="w"> </span><span class="nv">$RECIPE_DIR</span>/emscripten.meson.cross<span class="w"> </span><span class="nv">$SRC_DIR</span>
+<span class="nb">echo</span><span class="w"> </span><span class="s2">"python = '</span><span class="si">${</span><span class="nv">PYTHON</span><span class="si">}</span><span class="s2">'"</span><span class="w"> </span>&gt;&gt;<span class="w"> </span><span class="nv">$SRC_DIR</span>/emscripten.meson.cross
+
+<span class="si">${</span><span class="nv">PYTHON</span><span class="si">}</span><span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>.<span class="w"> </span>-vvv<span class="w"> </span>--no-deps<span class="w"> </span>--no-build-isolation<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>-Csetup-args<span class="o">=</span><span class="s2">"--cross-file=</span><span class="nv">$SRC_DIR</span><span class="s2">/emscripten.meson.cross"</span>
+</pre></div>
+</div>
+<p><strong>Example recipes</strong>:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/emscripten-forge/recipes/tree/main/recipes/recipes_emscripten/contourpy">contourpy</a></p></li>
+<li><p><a class="reference external" href="https://github.com/emscripten-forge/recipes/tree/main/recipes/recipes_emscripten/numpy">numpy</a></p></li>
+</ul>
+</section>
+<section id="rust">
+<h3>rust<a class="headerlink" href="#rust" title="Link to this heading">#</a></h3>
+<p>Building rust packages with PyO3 / maturin typically works out of the box.</p>
+<p>For a maturin / cffi / pyo3 package, the following requirements are usually necessary:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">requirements</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">build</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">cross-python_${{ target_platform }}</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">cffi == 1.15.1 (# at the time of writing pinning cffi == 1.15.1 is necessary, may change in the future)</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">setuptools-rust</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">rust</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">maturin</span>
+
+<span class="w">  </span><span class="nt">host</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python</span>
+<span class="w">  </span><span class="c1"># at the time of writing pinning cffi == 1.15.1 is necessary, may change in the future)</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">cffi == 1.15.1</span>
+<span class="w">  </span><span class="nt">run</span><span class="p">:</span>
+<span class="w">  </span><span class="c1"># at the time of writing pinning cffi == 1.15.1 is necessary, may change in the future)</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">cffi == 1.15.1</span>
+</pre></div>
+</div>
+<p><strong>Example recipes</strong>:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/emscripten-forge/recipes/tree/main/recipes/recipes_emscripten/cryptography">cryptography</a></p></li>
+<li><p><a class="reference external" href="https://github.com/emscripten-forge/recipes/tree/main/recipes/recipes_emscripten/pydantic-core">pydantic-core</a></p></li>
+<li><p><a class="reference external" href="https://github.com/emscripten-forge/recipes/tree/main/recipes/recipes_emscripten/pycrdt">pycrdt</a></p></li>
+</ul>
+</section>
+</section>
+<section id="r-packages">
+<h2>R Packages<a class="headerlink" href="#r-packages" title="Link to this heading">#</a></h2>
+<p>For a package without dependencies of other R packages, only these requirements are usually necessary:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">requirements</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">build</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">cross-r-base_${{ target_platform }}</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">${{ compiler("c") }}</span>
+</pre></div>
+</div>
+<p>Some R packages use the <a class="reference external" href="https://cran.r-project.org/web/packages/Rcpp/index.html">Rcpp</a> package for a seamless integration of R and C++. <a class="reference external" href="https://cran.r-project.org/web/packages/Rcpp/index.html">Rcpp</a> and all other R-dependencies must be in all 3 <code class="docutils literal notranslate"><span class="pre">requirements</span></code> sections (<code class="docutils literal notranslate"><span class="pre">build</span></code>, <code class="docutils literal notranslate"><span class="pre">host</span></code>, and <code class="docutils literal notranslate"><span class="pre">run</span></code>). For example,</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">requirements</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">build</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">cross-r-base_${{ target_platform }}</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">${{ compiler("c") }}</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">r-rcpp</span>
+<span class="w">  </span><span class="nt">host</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">r-rcpp</span>
+<span class="w">  </span><span class="nt">run</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">r-rcpp</span>
+</pre></div>
+</div>
+<p>There needs to be 2 urls because very frequently the first one is not reachable.</p>
+<p>For the tests, we only check that the shared library for the package exists. Eventually we should be able to load the package and do actual tests, but that’s not available yet.</p>
+<p><strong>Example recipes</strong>:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/emscripten-forge/recipes/blob/main/recipes/recipes_emscripten/r-yaml/">r-yaml</a></p></li>
+<li><p><a class="reference external" href="https://github.com/emscripten-forge/recipes/blob/main/recipes/recipes_emscripten/r-plyr/">r-plyr</a></p></li>
+</ul>
+</section>
+</section>
+
+<div class="section ablog__blog_comments">
+   
+</div>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="../index.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Introduction</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="recipe_format.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Recipe format</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item"><div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#c-c-packages">C/C++ Packages</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#cmake">CMake</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#configure-make">Configure / Make</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#python-packages">Python Packages</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pip-setuptools">pip / setuptools</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#meson">meson</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#rust">rust</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#r-packages">R Packages</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Emscripten-forge maintainers
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2026.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

@@ -1,0 +1,679 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta property="og:title" content="JAVA" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://emscripten-forge.org/usage/java.html" />
+<meta property="og:site_name" content="Emscripten-forge" />
+<meta property="og:description" content="Conda packages and recipes for the emscripten-wasm32 and emscripten-wasm64 WebAssembly platforms." />
+<meta property="og:image" content="https://emscripten-forge.org/_static/og_image.png" />
+<meta property="og:image:alt" content="Emscripten-forge" />
+<meta name="description" content="We provide openjdk21 and openjdk8 packages in emscripten-forge that allow running unmodified.jar executables and java applets in the browser, without a Java server. openjdk21 recipe documentation::..." />
+
+    <title>JAVA &#8212; Emscripten-forge</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=4418a689" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=75cd5198" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../_static/scripts/fontawesome.js?digest=90905a2f556bf617f1a9"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
+
+    <script src="../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=fab101a9"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'usage/java';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <link rel="icon" href="../_static/icon.svg"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  
+    
+    <script src="../_static/searchtools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script src="../searchindex.js"></script>
+     
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/icon.svg" class="logo__image only-light" alt="Emscripten-forge logo"/>
+    <img src="../_static/icon.svg" class="logo__image only-dark pst-js-only" alt="Emscripten-forge logo"/>
+  
+  
+    <p class="title logo__title">Emscripten-forge</p>
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../development/adding_packages.html">Adding packages</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development/recipe_format.html">Recipe format</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development/local_builds.html">Local builds</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development/conda_build_config.html">Conda build config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development/troubleshooting.html">Troubleshooting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development/code_of_conduct.html">Code of Conduct</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Usage</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="installing_packages.html">Installing packages</a></li>
+<li class="toctree-l1"><a class="reference internal" href="jupyterlite.html">JupyterLite Xeus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="package_server.html">Package Server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="qtapp.html">Experimental Qt runner</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Project</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../blog/index.html">Blog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../project/get_involved.html">Get Involved</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../project/related_projects.html">Related Projects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../project/showcase.html">Showcase</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../project/faq.html">FAQ</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../project/credits.html">Credits</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+<a href="https://github.com/emscripten-forge/recipes" target="_blank"
+   class="btn btn-sm btn-source-repository-button"
+   title="Source repository"
+   data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+
+</a>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/usage/java.md" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.md</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button pst-navbar-icon"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+  </ul>
+</div>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+<button class="sidebar-toggle secondary-toggle btn btn-sm pst-navbar-icon" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>JAVA</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#openjdk21-recipe-documentation">openjdk21 recipe documentation:</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#hosting-the-page">Hosting the page</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#prelinked-runtime">Prelinked runtime</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#openjdk8-recipe-documentation">openjdk8 recipe documentation:</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#java-web-start">Java Web Start</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#outside-the-browser">Outside the browser</a></li>
+</ul>
+</li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                   <section id="java">
+<h1>JAVA<a class="headerlink" href="#java" title="Link to this heading">#</a></h1>
+<p>We provide <code class="docutils literal notranslate"><span class="pre">openjdk21</span></code> and <code class="docutils literal notranslate"><span class="pre">openjdk8</span></code> packages in emscripten-forge that allow running unmodified <code class="docutils literal notranslate"><span class="pre">.jar</span></code> executables and java applets in the browser, without a Java server.</p>
+<section id="openjdk21-recipe-documentation">
+<h2>openjdk21 recipe documentation:<a class="headerlink" href="#openjdk21-recipe-documentation" title="Link to this heading">#</a></h2>
+<p>Create one environment with the tools (<code class="docutils literal notranslate"><span class="pre">openjdk21-wasm-link</span></code> and the Emscripten
+toolchain it uses), and one with the JVM:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nv">CH</span><span class="o">=</span><span class="s2">"-c oci://ghcr.io/emscripten-forge/emscripten-forge-4x -c conda-forge"</span>
+micromamba<span class="w"> </span>create<span class="w"> </span>-y<span class="w"> </span>-n<span class="w"> </span>env_tools<span class="w"> </span><span class="nv">$CH</span><span class="w"> </span>openjdk-tools
+micromamba<span class="w"> </span>activate<span class="w"> </span>env_tools
+micromamba<span class="w"> </span>create<span class="w"> </span>-y<span class="w"> </span>-p<span class="w"> </span>./jdk21env<span class="w"> </span>--platform<span class="w"> </span>emscripten-wasm32<span class="w"> </span><span class="nv">$CH</span><span class="w"> </span>openjdk21
+</pre></div>
+</div>
+<p>Link your application into a page:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>openjdk21-wasm-link<span class="w"> </span>--prefix<span class="w"> </span>./jdk21env<span class="w"> </span>-o<span class="w"> </span>out/app.html<span class="w"> </span>--app<span class="w"> </span>path/to/app.jar<span class="w"> </span>--arg<span class="w"> </span>-jar<span class="w"> </span>--arg<span class="w"> </span>/app/app.jar
+</pre></div>
+</div>
+<p>Packing a multi-file jar or a directory is supported, for example</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>openjdk21-wasm-link<span class="w"> </span>--prefix<span class="w"> </span>./jdk21env<span class="w"> </span>-o<span class="w"> </span>out/multifilejar.html<span class="w"> </span>--app<span class="w"> </span>./multifilejardir<span class="w"> </span>--arg<span class="w"> </span>-jar<span class="w"> </span>--arg<span class="w"> </span>/app/multifilejardir/jarsdir/jarexecutable.jar
+</pre></div>
+</div>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Option</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">--prefix</span> <span class="pre">DIR</span></code></p></td>
+<td><p>The emscripten-wasm32 environment with <code class="docutils literal notranslate"><span class="pre">openjdk21</span></code>. <strong>Required.</strong></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">-o</span> <span class="pre">FILE</span></code></p></td>
+<td><p>Output file, <code class="docutils literal notranslate"><span class="pre">.html</span></code> or <code class="docutils literal notranslate"><span class="pre">.js</span></code>. <strong>Required.</strong></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">--app</span> <span class="pre">SRC[&#64;DEST]</span></code></p></td>
+<td><p>Copy a host file or directory into the virtual file system (default <code class="docutils literal notranslate"><span class="pre">DEST</span></code>: <code class="docutils literal notranslate"><span class="pre">/app/&lt;basename&gt;</span></code>). Repeatable.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">--arg</span> <span class="pre">ARG</span></code></p></td>
+<td><p>Default Java command-line argument. Repeatable. Under node, command-line arguments override these; in the browser, <code class="docutils literal notranslate"><span class="pre">?args=a,b</span></code> in the page URL overrides them.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">--env</span> <span class="pre">NAME=VALUE</span></code></p></td>
+<td><p>Environment variable for the program. Repeatable. In the browser, the page URL can set more with <code class="docutils literal notranslate"><span class="pre">?env=NAME=VALUE,...</span></code>; these are added to the <code class="docutils literal notranslate"><span class="pre">--env</span></code> ones and replace any with the same name.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">--headless</span></code></p></td>
+<td><p>No display: uses <code class="docutils literal notranslate"><span class="pre">libawt_headless</span></code> and leaves out x11.wasm.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">--node</span></code></p></td>
+<td><p>Build for node (the program exits when <code class="docutils literal notranslate"><span class="pre">main</span></code> returns). Implies <code class="docutils literal notranslate"><span class="pre">--headless</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">--max-memory</span> <span class="pre">MB</span></code></p></td>
+<td><p>Maximum wasm memory (default <code class="docutils literal notranslate"><span class="pre">2048</span></code>).</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">--pool</span> <span class="pre">N</span></code></p></td>
+<td><p>Number of pre-started pthread workers (default <code class="docutils literal notranslate"><span class="pre">12</span></code>).</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">--opt</span> <span class="pre">LEVEL</span></code></p></td>
+<td><p>emcc optimisation level for the link (default <code class="docutils literal notranslate"><span class="pre">-O2</span></code>).</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">--module</span></code></p></td>
+<td><p>Link only the runtime, as a module like the prelinked one below (<code class="docutils literal notranslate"><span class="pre">-o</span> <span class="pre">DIR/openjdk21.js</span></code>).</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">--</span></code></p></td>
+<td><p>Pass everything after it to emcc.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<section id="hosting-the-page">
+<h3>Hosting the page<a class="headerlink" href="#hosting-the-page" title="Link to this heading">#</a></h3>
+<p>For this openjdk21 recipe, <code class="docutils literal notranslate"><span class="pre">SharedArrayBuffer</span></code> is needed. It must be served with these two headers:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>Cross-Origin-Opener-Policy: same-origin
+Cross-Origin-Embedder-Policy: require-corp
+</pre></div>
+</div>
+<p>You don’t need to configure them yourself:</p>
+<ul class="simple">
+<li><p>When the output is an <code class="docutils literal notranslate"><span class="pre">.html</span></code> page, <code class="docutils literal notranslate"><span class="pre">openjdk21-wasm-link</span></code> copies
+<code class="docutils literal notranslate"><span class="pre">coi-serviceworker.js</span></code> next to it, and the page loads it. If the server
+doesn’t send the headers, this service worker adds them in the browser and
+reloads the page. This makes the page work on static hosts such as GitHub
+Pages. Keep <code class="docutils literal notranslate"><span class="pre">coi-serviceworker.js</span></code> in the same directory as the page.</p></li>
+<li><p>For local testing, <code class="docutils literal notranslate"><span class="pre">serve.py</span></code> sends the headers directly:
+<code class="docutils literal notranslate"><span class="pre">python3</span> <span class="pre">$CONDA_PREFIX/share/openjdk-tools/serve.py</span> <span class="pre">out</span> <span class="pre">8000</span></code> (in <code class="docutils literal notranslate"><span class="pre">env_tools</span></code>).</p></li>
+</ul>
+<p>Either way, the page must be served over HTTPS or from <code class="docutils literal notranslate"><span class="pre">localhost</span></code>; browsers
+ignore these headers on other plain-http addresses. Opening the file directly
+(<code class="docutils literal notranslate"><span class="pre">file://</span></code>) does not work either: service workers only run on http(s) pages,
+and the browser won’t load the <code class="docutils literal notranslate"><span class="pre">.wasm</span></code> and <code class="docutils literal notranslate"><span class="pre">.data</span></code> files from <code class="docutils literal notranslate"><span class="pre">file://</span></code>.</p>
+<p>If you link to <code class="docutils literal notranslate"><span class="pre">.js</span></code> instead of <code class="docutils literal notranslate"><span class="pre">.html</span></code>, no service worker is added. Your page
+must then send the headers itself. None of this applies to
+programs linked with <code class="docutils literal notranslate"><span class="pre">--node</span></code>.</p>
+</section>
+<section id="prelinked-runtime">
+<h3>Prelinked runtime<a class="headerlink" href="#prelinked-runtime" title="Link to this heading">#</a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">openjdk21</span></code> package also contains the runtime already linked, like
+<code class="docutils literal notranslate"><span class="pre">openjdk8</span></code> does, so a page can run Java without <code class="docutils literal notranslate"><span class="pre">openjdk21-wasm-link</span></code>. Copy
+these files into one directory on your web server:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ls<span class="w"> </span>jdk21env/share/openjdk21-wasm/
+<span class="c1"># openjdk21-web.js  openjdk21.js  openjdk21.wasm  openjdk21-jre.json</span>
+<span class="c1"># openjdk21-jre.data.gz  coi-serviceworker.js  ...</span>
+</pre></div>
+</div>
+<p>and start Java from a page, listing the files the program needs:</p>
+<div class="highlight-html notranslate"><div class="highlight"><pre><span></span><span class="p">&lt;</span><span class="nt">div</span> <span class="na">id</span><span class="o">=</span><span class="s">"x11-wasm-root"</span> <span class="na">style</span><span class="o">=</span><span class="s">"position:relative;width:800px;height:600px"</span><span class="p">&gt;&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">script</span> <span class="na">src</span><span class="o">=</span><span class="s">"/jvm/openjdk21-web.js"</span><span class="p">&gt;&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">script</span><span class="p">&gt;</span>
+<span class="w">  </span><span class="nx">OpenJDK21</span><span class="p">.</span><span class="nx">run</span><span class="p">({</span>
+<span class="w">    </span><span class="nx">args</span><span class="o">:</span><span class="w"> </span><span class="p">[</span><span class="s1">'-jar'</span><span class="p">,</span><span class="w"> </span><span class="s1">'/app/app.jar'</span><span class="p">],</span>
+<span class="w">    </span><span class="nx">root</span><span class="o">:</span><span class="w"> </span><span class="nb">document</span><span class="p">.</span><span class="nx">getElementById</span><span class="p">(</span><span class="s1">'x11-wasm-root'</span><span class="p">),</span><span class="w">   </span><span class="c1">// where Java windows are drawn</span>
+<span class="w">    </span><span class="nx">files</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="s1">'/app/app.jar'</span><span class="o">:</span><span class="w"> </span><span class="s1">'app.jar'</span><span class="w"> </span><span class="p">},</span><span class="w">              </span><span class="c1">// VM path: URL to fetch</span>
+<span class="w">    </span><span class="nx">onExit</span><span class="o">:</span><span class="w"> </span><span class="kd">function</span><span class="w"> </span><span class="p">(</span><span class="nx">status</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'Java exited with '</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nx">status</span><span class="p">);</span><span class="w"> </span><span class="p">},</span>
+<span class="w">  </span><span class="p">});</span>
+<span class="p">&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
+</pre></div>
+</div>
+<p>The page must be cross-origin isolated, as above. If the server doesn’t send
+the headers, <code class="docutils literal notranslate"><span class="pre">openjdk21-web.js</span></code> loads <code class="docutils literal notranslate"><span class="pre">coi-serviceworker.js</span></code> from its own
+directory; a service worker only covers pages in its directory and below, so
+put the page next to the files (or in a subdirectory) in that case.
+<code class="docutils literal notranslate"><span class="pre">OpenJDK21.run</span></code> also takes <code class="docutils literal notranslate"><span class="pre">env</span></code>, <code class="docutils literal notranslate"><span class="pre">jvmArgs</span></code>, <code class="docutils literal notranslate"><span class="pre">heap</span></code> (e.g. <code class="docutils literal notranslate"><span class="pre">'512m'</span></code>),
+<code class="docutils literal notranslate"><span class="pre">onStdout</span></code>, <code class="docutils literal notranslate"><span class="pre">onStderr</span></code>, <code class="docutils literal notranslate"><span class="pre">onProgress</span></code>, <code class="docutils literal notranslate"><span class="pre">documentTitle:</span> <span class="pre">false</span></code> (keep the page
+title) and <code class="docutils literal notranslate"><span class="pre">stdin:</span> <span class="pre">true</span></code> (then feed <code class="docutils literal notranslate"><span class="pre">System.in</span></code> with <code class="docutils literal notranslate"><span class="pre">module.writeStdin(text)</span></code>
+and <code class="docutils literal notranslate"><span class="pre">module.closeStdin()</span></code> on the module the returned promise gives).</p>
+<p><code class="docutils literal notranslate"><span class="pre">openjdk21-java</span></code> from <code class="docutils literal notranslate"><span class="pre">openjdk-tools</span></code> runs the same prelinked runtime under
+Node.js, like the <code class="docutils literal notranslate"><span class="pre">java</span></code> command (headless AWT; the host’s files are visible):</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nv">OPENJDK21_WASM_HOME</span><span class="o">=</span>./jdk21env/share/openjdk21-wasm<span class="w"> </span>openjdk21-java<span class="w"> </span>-cp<span class="w"> </span>classes<span class="w"> </span>Main
+</pre></div>
+</div>
+</section>
+</section>
+<section id="openjdk8-recipe-documentation">
+<h2>openjdk8 recipe documentation:<a class="headerlink" href="#openjdk8-recipe-documentation" title="Link to this heading">#</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">openjdk8</span></code> runs Java applets in the browser. It can also run plain Java desktop
+programs.</p>
+<p>Install the package and copy its browser files into one directory on your
+web server:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>micromamba<span class="w"> </span>create<span class="w"> </span>-y<span class="w"> </span>-p<span class="w"> </span>./jdk8env<span class="w"> </span>--platform<span class="w"> </span>emscripten-wasm32<span class="w"> </span>-c<span class="w"> </span>oci://ghcr.io/emscripten-forge/emscripten-forge-4x<span class="w"> </span>-c<span class="w"> </span>conda-forge<span class="w"> </span>openjdk8
+ls<span class="w"> </span>jdk8env/share/openjdk8-wasm/
+<span class="c1"># openjdk8-web.js  openjdk8.js  openjdk8.wasm  openjdk8-jre.json  openjdk8-jre.data.gz</span>
+<span class="c1"># openjdk8-javaws.jar</span>
+</pre></div>
+</div>
+<p>Then load <code class="docutils literal notranslate"><span class="pre">openjdk8-web.js</span></code> on the page that contains the applet:</p>
+<div class="highlight-html notranslate"><div class="highlight"><pre><span></span><span class="p">&lt;</span><span class="nt">script</span> <span class="na">src</span><span class="o">=</span><span class="s">"/jvm/openjdk8-web.js"</span><span class="p">&gt;&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">applet</span> <span class="na">code</span><span class="o">=</span><span class="s">"MyApplet.class"</span> <span class="na">codebase</span><span class="o">=</span><span class="s">"classes/"</span> <span class="na">archive</span><span class="o">=</span><span class="s">"my.jar"</span> <span class="na">width</span><span class="o">=</span><span class="s">"400"</span> <span class="na">height</span><span class="o">=</span><span class="s">"300"</span><span class="p">&gt;</span>
+  <span class="p">&lt;</span><span class="nt">param</span> <span class="na">name</span><span class="o">=</span><span class="s">"foo"</span> <span class="na">value</span><span class="o">=</span><span class="s">"bar"</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">applet</span><span class="p">&gt;</span>
+</pre></div>
+</div>
+<p>Replace <code class="docutils literal notranslate"><span class="pre">/jvm/</span></code> with wherever you put the files. The loader loads the other
+files from its own directory (or from a <code class="docutils literal notranslate"><span class="pre">data-base=&quot;...&quot;</span></code> attribute on the
+script tag). When the page has loaded, it starts every <code class="docutils literal notranslate"><span class="pre">&lt;applet&gt;</span></code>, and every
+Java <code class="docutils literal notranslate"><span class="pre">&lt;object&gt;</span></code> or <code class="docutils literal notranslate"><span class="pre">&lt;embed&gt;</span></code>, in a single Java VM. To start them yourself
+instead, add <code class="docutils literal notranslate"><span class="pre">data-applets=&quot;off&quot;</span></code> to the script tag and call
+<code class="docutils literal notranslate"><span class="pre">OpenJDK8.runApplets()</span></code>.</p>
+<p>To run a program instead of an applet, call <code class="docutils literal notranslate"><span class="pre">OpenJDK8.run()</span></code> and list the
+files the program needs:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>OpenJDK8.run({
+  args: ['-cp', '/app', 'Main'],
+  root: element,                          // where Java windows are drawn
+  files: { '/app/Main.class': 'Main.class' } // VM path: URL to fetch
+})
+</pre></div>
+</div>
+<section id="java-web-start">
+<h3>Java Web Start<a class="headerlink" href="#java-web-start" title="Link to this heading">#</a></h3>
+<p>On a page that loads <code class="docutils literal notranslate"><span class="pre">openjdk8-web.js</span></code>, following a link to a <code class="docutils literal notranslate"><span class="pre">.jnlp</span></code> file
+starts that application with Java Web Start, as a browser with Java installed
+did:</p>
+<div class="highlight-html notranslate"><div class="highlight"><pre><span></span><span class="p">&lt;</span><span class="nt">script</span> <span class="na">src</span><span class="o">=</span><span class="s">"/jvm/openjdk8-web.js"</span><span class="p">&gt;&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">a</span> <span class="na">href</span><span class="o">=</span><span class="s">"app/launch.jnlp"</span><span class="p">&gt;</span>Launch the application<span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;</span>
+</pre></div>
+</div>
+<p>Web Start is IcedTea-Web’s <code class="docutils literal notranslate"><span class="pre">javaws</span></code>, in <code class="docutils literal notranslate"><span class="pre">openjdk8-javaws.jar</span></code>, which is only
+downloaded when it is needed. It reads the JNLP file, downloads the jars,
+shows the usual security dialogs (unsigned code, certificates, missing
+manifest attributes), and runs the application in the sandbox or with the
+permissions it was granted; the JNLP services (<code class="docutils literal notranslate"><span class="pre">javax.jnlp.BasicService</span></code>,
+…) work. The application’s windows appear in a layer over the page. Call
+<code class="docutils literal notranslate"><span class="pre">OpenJDK8.runJNLP(url,</span> <span class="pre">options)</span></code> to start one from a script, and add
+<code class="docutils literal notranslate"><span class="pre">data-jnlp=&quot;off&quot;</span></code> to the script tag to leave <code class="docutils literal notranslate"><span class="pre">.jnlp</span></code> links alone. The JNLP
+file and its jars are fetched by the page, so they must come from the same
+origin (or be served with CORS headers). Give the JNLP file a <code class="docutils literal notranslate"><span class="pre">codebase</span></code>, as
+JNLP files normally have: without one, <code class="docutils literal notranslate"><span class="pre">javaws</span></code> treats the application as a
+local file and asks whether to run code from its location. Each page runs one
+Java VM, so it runs one Web Start application at a time.</p>
+<p><code class="docutils literal notranslate"><span class="pre">run()</span></code> and <code class="docutils literal notranslate"><span class="pre">runJNLP()</span></code> also take <code class="docutils literal notranslate"><span class="pre">windowManager:</span> <span class="pre">true</span></code>, which lets x11.wasm
+draw title bars on top-level windows so they can be moved and closed
+(<code class="docutils literal notranslate"><span class="pre">OpenJDK21.run</span></code> takes it too). It is experimental: with AWT the title bar
+shows the name of a hidden helper window (“FocusProxy”) rather than the
+frame’s title.</p>
+</section>
+<section id="outside-the-browser">
+<h3>Outside the browser<a class="headerlink" href="#outside-the-browser" title="Link to this heading">#</a></h3>
+<p>Outside the browser, <code class="docutils literal notranslate"><span class="pre">openjdk8-java</span></code> from the <code class="docutils literal notranslate"><span class="pre">openjdk-tools</span></code> package (see the
+openjdk21 section) runs Java programs under Node.js 24 or later, with headless
+AWT, like the <code class="docutils literal notranslate"><span class="pre">java</span></code> command, and <code class="docutils literal notranslate"><span class="pre">openjdk8-javaws</span></code> runs JNLP files. Point
+them at the <code class="docutils literal notranslate"><span class="pre">openjdk8</span></code> environment:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">OPENJDK8_WASM_HOME</span><span class="o">=</span>./jdk8env/share/openjdk8-wasm
+openjdk8-java<span class="w"> </span>-cp<span class="w"> </span>classes<span class="w"> </span>Main
+openjdk8-javaws<span class="w"> </span>app.jnlp
+</pre></div>
+</div>
+</section>
+</section>
+</section>
+
+<div class="section ablog__blog_comments">
+   
+</div>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item"><div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#openjdk21-recipe-documentation">openjdk21 recipe documentation:</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#hosting-the-page">Hosting the page</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#prelinked-runtime">Prelinked runtime</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#openjdk8-recipe-documentation">openjdk8 recipe documentation:</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#java-web-start">Java Web Start</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#outside-the-browser">Outside the browser</a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Emscripten-forge maintainers
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2026.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

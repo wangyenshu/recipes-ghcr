@@ -1,0 +1,658 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta property="og:title" content="Experimental Qt runner" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://emscripten-forge.org/usage/qtapp.html" />
+<meta property="og:site_name" content="Emscripten-forge" />
+<meta property="og:description" content="Conda packages and recipes for the emscripten-wasm32 and emscripten-wasm64 WebAssembly platforms." />
+<meta property="og:image" content="https://emscripten-forge.org/_static/og_image.png" />
+<meta property="og:image:alt" content="Emscripten-forge" />
+<meta name="description" content="A small in-browser runner for Qt6-wasm packages published to the emscripten-forge-4x-experimental channel. Given the URL of a.tar.bz2 package (or a locally-picked file), it fetches, unpacks, and bo..." />
+
+    <title>Experimental Qt runner &#8212; Emscripten-forge</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=4418a689" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=75cd5198" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../_static/scripts/fontawesome.js?digest=90905a2f556bf617f1a9"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
+
+    <script src="../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=fab101a9"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'usage/qtapp';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <link rel="icon" href="../_static/icon.svg"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Blog" href="../blog/index.html" />
+    <link rel="prev" title="Package Server" href="package_server.html" /> 
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  
+    
+    <script src="../_static/searchtools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script src="../searchindex.js"></script>
+     
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/icon.svg" class="logo__image only-light" alt="Emscripten-forge logo"/>
+    <img src="../_static/icon.svg" class="logo__image only-dark pst-js-only" alt="Emscripten-forge logo"/>
+  
+  
+    <p class="title logo__title">Emscripten-forge</p>
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../development/adding_packages.html">Adding packages</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development/recipe_format.html">Recipe format</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development/local_builds.html">Local builds</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development/conda_build_config.html">Conda build config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development/troubleshooting.html">Troubleshooting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development/code_of_conduct.html">Code of Conduct</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Usage</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="installing_packages.html">Installing packages</a></li>
+<li class="toctree-l1"><a class="reference internal" href="jupyterlite.html">JupyterLite Xeus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="package_server.html">Package Server</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Experimental Qt runner</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Project</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../blog/index.html">Blog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../project/get_involved.html">Get Involved</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../project/related_projects.html">Related Projects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../project/showcase.html">Showcase</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../project/faq.html">FAQ</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../project/credits.html">Credits</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+<a href="https://github.com/emscripten-forge/recipes" target="_blank"
+   class="btn btn-sm btn-source-repository-button"
+   title="Source repository"
+   data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+
+</a>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/usage/qtapp.md" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.md</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button pst-navbar-icon"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+  </ul>
+</div>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+<button class="sidebar-toggle secondary-toggle btn btn-sm pst-navbar-icon" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Experimental Qt runner</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#available-apps">Available apps</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#deep-links">Deep-links</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#how-it-works">How it works</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#packaging-your-own-qt6-wasm-app-for-the-runner">Packaging your own Qt6-wasm app for the runner</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#reference-recipes">Reference recipes</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#browser-requirements">Browser requirements</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#current-limitations">Current limitations</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#source">Source</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                   <section id="experimental-qt-runner">
+<h1>Experimental Qt runner<a class="headerlink" href="#experimental-qt-runner" title="Link to this heading">#</a></h1>
+<div class="admonition-experimental admonition">
+<p class="admonition-title">Experimental</p>
+<p>The purpose of this page is to demonstrate that packaging certain
+Qt applications for the browser via emscripten-forge is
+manageable. Expect rough edges; contributions welcome. Work on
+continued enhancements is ongoing.</p>
+</div>
+<p>A small in-browser runner for Qt6-wasm packages published to the
+<a class="reference external" href="https://prefix.dev/channels/emscripten-forge-4x-experimental">emscripten-forge-4x-experimental</a>
+channel. Given the URL of a <code class="docutils literal notranslate"><span class="pre">.tar.bz2</span></code> package (or a locally-picked file),
+it fetches, unpacks, and boots the Qt app entirely client-side.</p>
+<p><strong>Try it</strong>: <a href="../qtapp/">/qtapp/</a></p>
+<section id="available-apps">
+<h2>Available apps<a class="headerlink" href="#available-apps" title="Link to this heading">#</a></h2>
+<p>Currently on the
+<a class="reference external" href="https://prefix.dev/channels/emscripten-forge-4x-experimental">emscripten-forge-4x-experimental</a>
+channel:</p>
+<ul class="simple">
+<li><p><strong><a href="../qtapp/?pkg=https%3A%2F%2Frepo.prefix.dev%2Femscripten-forge-4x-experimental%2Femscripten-wasm32%2Fqt-calculator-experimental-6.11.2-hc780342_1.tar.bz2">qt-calculator</a></strong> —
+Qt’s own upstream calculator example
+(<a class="reference external" href="https://github.com/emscripten-forge/recipes/tree/main/recipes/recipes_emscripten/qt-calculator-experimental">recipe</a>).</p></li>
+<li><p><strong><a href="../qtapp/?pkg=https%3A%2F%2Frepo.prefix.dev%2Femscripten-forge-4x-experimental%2Femscripten-wasm32%2Fqhexedit2-experimental-0.9.0-hc780342_0.tar.bz2">qhexedit2</a></strong> —
+QHexEdit2 hex editor: open a file, view/edit bytes in hex + ASCII, save via browser download
+(<a class="reference external" href="https://github.com/emscripten-forge/recipes/tree/main/recipes/recipes_emscripten/qhexedit2-experimental">recipe</a>).</p></li>
+<li><p><strong><a href="../qtapp/?pkg=https%3A%2F%2Frepo.prefix.dev%2Femscripten-forge-4x-experimental%2Femscripten-wasm32%2Fsqlitebrowser-experimental-3.13.99-h8b281d3_3.tar.bz2">sqlitebrowser</a></strong> —
+DB Browser for SQLite: create tables, run queries, download <code class="docutils literal notranslate"><span class="pre">.sqlite</span></code> files
+(<a class="reference external" href="https://github.com/emscripten-forge/recipes/tree/main/recipes/recipes_emscripten/sqlitebrowser-experimental">recipe</a>).</p></li>
+<li><p><strong><a href="../qtapp/?pkg=https%3A%2F%2Fprefix.dev%2Femscripten-forge-4x-experimental%2Femscripten-wasm32%2Fregina-7.4.1-h99d6908_1.tar.bz2">regina</a></strong> -
+Regina is a software package for low-dimensional topologists, with a focus on 3-manifold and 4-manifold triangulations, knots and links, normal surfaces, and angle structures
+(<a class="reference external" href="https://github.com/emscripten-forge/recipes/tree/main/recipes/recipes_emscripten/regina">recipe</a>).</p></li>
+</ul>
+<p>The exact <code class="docutils literal notranslate"><span class="pre">.tar.bz2</span></code> filename changes on each rebuild (build-hash suffix);
+browse the <a class="reference external" href="https://prefix.dev/channels/emscripten-forge-4x-experimental">channel index</a>
+for current URLs.</p>
+</section>
+<section id="deep-links">
+<h2>Deep-links<a class="headerlink" href="#deep-links" title="Link to this heading">#</a></h2>
+<p>Append <code class="docutils literal notranslate"><span class="pre">?pkg=&lt;URL-encoded</span> <span class="pre">package</span> <span class="pre">URL&gt;</span></code> to auto-load a package on page
+open. Both parameters (<code class="docutils literal notranslate"><span class="pre">?pkg=</span></code> and <code class="docutils literal notranslate"><span class="pre">?fullscreen=1</span></code>) can be shared as
+regular URLs. Combine as <code class="docutils literal notranslate"><span class="pre">?pkg=…&amp;fullscreen=1</span></code> to start with the top
+and status bars hidden — useful for embedding.</p>
+</section>
+<section id="how-it-works">
+<h2>How it works<a class="headerlink" href="#how-it-works" title="Link to this heading">#</a></h2>
+<ol class="arabic simple">
+<li><p>Fetches the <code class="docutils literal notranslate"><span class="pre">.tar.bz2</span></code> (or reads it via file picker / drag-and-drop).</p></li>
+<li><p>Decodes bzip2 and walks the tar entries via
+<a class="reference external" href="https://www.npmjs.com/package/&#64;emscripten-forge/untarjs"><code class="docutils literal notranslate"><span class="pre">&#64;emscripten-forge/untarjs</span></code></a>.</p></li>
+<li><p>Locates the app under <code class="docutils literal notranslate"><span class="pre">share/&lt;name&gt;/</span></code> inside the package.</p></li>
+<li><p>Wraps every file in that directory as a <code class="docutils literal notranslate"><span class="pre">blob:</span></code> URL, then loads Qt’s
+<code class="docutils literal notranslate"><span class="pre">qtloader.js</span></code> and the app’s Emscripten glue against those blobs.</p></li>
+</ol>
+</section>
+<section id="packaging-your-own-qt6-wasm-app-for-the-runner">
+<h2>Packaging your own Qt6-wasm app for the runner<a class="headerlink" href="#packaging-your-own-qt6-wasm-app-for-the-runner" title="Link to this heading">#</a></h2>
+<p>In principle, any Qt6-wasm recipe that installs
+<code class="docutils literal notranslate"><span class="pre">share/&lt;name&gt;/{&lt;name&gt;.wasm,</span> <span class="pre">&lt;name&gt;.js,</span> <span class="pre">qtloader.js}</span></code> is loadable. The
+runner discovers the app name by scanning for the sole <code class="docutils literal notranslate"><span class="pre">share/*/*.wasm</span></code>
+file, so nothing external needs to be configured.</p>
+<p>The two reference recipes linked at the end of this section are the
+best place to start — copy the one that’s closest to your setup and
+adapt from there. The bullets below are a quick checklist of the
+non-obvious bits to watch for; the recipes show them in context.</p>
+<ul class="simple">
+<li><p><strong>Depend on the JSPI Qt6 variants</strong> in the recipe’s <code class="docutils literal notranslate"><span class="pre">host:</span></code> section —
+<code class="docutils literal notranslate"><span class="pre">qt6-main-jspi</span></code>, plus any of <code class="docutils literal notranslate"><span class="pre">qt6-5compat-jspi</span></code>, <code class="docutils literal notranslate"><span class="pre">qt6-svg-jspi</span></code>,
+<code class="docutils literal notranslate"><span class="pre">qt6-imageformats-jspi</span></code>, <code class="docutils literal notranslate"><span class="pre">qt6-webchannel-jspi</span></code>,
+<code class="docutils literal notranslate"><span class="pre">qt6-websockets-jspi</span></code> your app uses. JSPI is what lets Qt’s
+<code class="docutils literal notranslate"><span class="pre">app.exec()</span></code> event loop yield to the browser, so the vanilla
+<code class="docutils literal notranslate"><span class="pre">qt6-main</span></code> won’t produce a runnable app.</p></li>
+<li><p><strong>Use Qt’s CMake helpers</strong>. <code class="docutils literal notranslate"><span class="pre">qt_add_executable(&lt;name&gt;</span> <span class="pre">…)</span></code> is the
+simplest path — it applies the wasm-specific link flags Qt needs
+(embind linkage, <code class="docutils literal notranslate"><span class="pre">MODULARIZE=1</span></code>, <code class="docutils literal notranslate"><span class="pre">EXPORT_NAME=&lt;name&gt;_entry</span></code>, memory
+sizes, JSPI via <code class="docutils literal notranslate"><span class="pre">INTERFACE</span></code>). If you can’t call <code class="docutils literal notranslate"><span class="pre">qt_add_executable</span></code>
+(e.g., upstream sources use plain <code class="docutils literal notranslate"><span class="pre">add_executable</span></code> before
+<code class="docutils literal notranslate"><span class="pre">find_package(Qt6)</span></code>), call <code class="docutils literal notranslate"><span class="pre">qt6_finalize_target(&lt;target&gt;)</span></code> at the end
+of the CMakeLists — it applies the same setup.</p></li>
+<li><p><strong>Load Qt’s wasm helpers before <code class="docutils literal notranslate"><span class="pre">find_package(Qt6)</span></code></strong>. On
+emscripten-forge, Sphinx-invoked cmake doesn’t source Qt’s toolchain
+file automatically; add
+<code class="docutils literal notranslate"><span class="pre">include(&quot;$ENV{PREFIX}/lib/cmake/Qt6/QtPublicWasmToolchainHelpers.cmake&quot;)</span></code>
+before <code class="docutils literal notranslate"><span class="pre">find_package(Qt6)</span></code> so the target finalization can find
+<code class="docutils literal notranslate"><span class="pre">_qt_test_emscripten_version</span></code> and friends.</p></li>
+<li><p><strong>Synthesize <code class="docutils literal notranslate"><span class="pre">$EMSDK/.emscripten</span></code></strong> in <code class="docutils literal notranslate"><span class="pre">build.sh</span></code>. Qt’s wasm helpers
+read that file; emscripten-forge doesn’t ship it. Copy the block
+from the <a class="reference external" href="https://github.com/emscripten-forge/recipes/blob/main/recipes/recipes_emscripten/qt6/build_qtbase.sh"><code class="docutils literal notranslate"><span class="pre">qt6/build_qtbase.sh</span></code></a>
+recipe verbatim.</p></li>
+<li><p><strong>Install the four artifacts</strong> to <code class="docutils literal notranslate"><span class="pre">${PREFIX}/share/&lt;name&gt;/</span></code>:
+<code class="docutils literal notranslate"><span class="pre">&lt;name&gt;.wasm</span></code>, <code class="docutils literal notranslate"><span class="pre">&lt;name&gt;.js</span></code>, <code class="docutils literal notranslate"><span class="pre">&lt;name&gt;.html</span></code> (optional — runner
+produces its own), <code class="docutils literal notranslate"><span class="pre">qtloader.js</span></code>.</p></li>
+<li><p><strong>Route to the experimental channel</strong> — add
+<code class="docutils literal notranslate"><span class="pre">extra.channel:</span> <span class="pre">emscripten-forge-4x-experimental</span></code> to <code class="docutils literal notranslate"><span class="pre">recipe.yaml</span></code>
+until JSPI-Qt reaches the stable channel.</p></li>
+<li><p><strong>Expect wasm-specific patches</strong> for anything non-trivial. Apps that
+haven’t been officially wasm-ported need small <code class="docutils literal notranslate"><span class="pre">#ifdef</span> <span class="pre">__EMSCRIPTEN__</span></code>
+patches to bridge desktop APIs to what the browser provides and to
+disable features Qt-wasm doesn’t ship. The sqlitebrowser recipe
+below, for example, needs seven such patches: routing file open and
+save through <code class="docutils literal notranslate"><span class="pre">QFileDialog::getOpenFileContent</span></code> /
+<code class="docutils literal notranslate"><span class="pre">saveFileContent</span></code>, redirecting “New Database” to an in-memory SQLite,
+stubbing out its SSL-based cloud-sync code path, and a handful of
+smaller build-time fixes (missing header includes,
+<code class="docutils literal notranslate"><span class="pre">long</span></code>-vs-<code class="docutils literal notranslate"><span class="pre">ptrdiff_t</span></code> template instantiations in bundled Scintilla,
+etc.). A good survey of the shapes these fixes take.</p></li>
+</ul>
+<section id="reference-recipes">
+<h3>Reference recipes<a class="headerlink" href="#reference-recipes" title="Link to this heading">#</a></h3>
+<p>Both of these are minimal, self-contained, and current:</p>
+<ul class="simple">
+<li><p><strong><a class="reference external" href="https://github.com/emscripten-forge/recipes/tree/main/recipes/recipes_emscripten/qt-calculator-experimental">qt-calculator-experimental</a></strong> —
+hand-written CMakeLists over Qt’s own upstream calculator source
+(fetched from the <code class="docutils literal notranslate"><span class="pre">qtbase</span></code> submodule tarball). ~60 LOC total across
+recipe + CMakeLists + build script.</p></li>
+<li><p><strong><a class="reference external" href="https://github.com/emscripten-forge/recipes/tree/main/recipes/recipes_emscripten/sqlitebrowser-experimental">sqlitebrowser-experimental</a></strong> —
+a real 50K-LOC third-party Qt widget app patched for wasm. Shows the
+<code class="docutils literal notranslate"><span class="pre">qt6_finalize_target</span></code> route for CMakeLists you don’t control, plus
+seven small wasm-specific source patches (SSL stubs, file dialog
+bridging via <code class="docutils literal notranslate"><span class="pre">QFileDialog::getOpenFileContent</span></code>, in-memory database
+routing, etc.).</p></li>
+</ul>
+</section>
+</section>
+<section id="browser-requirements">
+<h2>Browser requirements<a class="headerlink" href="#browser-requirements" title="Link to this heading">#</a></h2>
+<p>Qt6-wasm on this channel uses JSPI, which needs:</p>
+<ul class="simple">
+<li><p>Chrome 137+ (April 2025)</p></li>
+<li><p>Firefox 141+ (July 2025)</p></li>
+<li><p>Safari 18.4+ (April 2025)</p></li>
+</ul>
+</section>
+<section id="current-limitations">
+<h2>Current limitations<a class="headerlink" href="#current-limitations" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p><strong>Continuous animation</strong> — currently problematic and flaky. Qt-wasm
+timer-driven animation under JSPI can starve the browser main thread
+in the default configuration, so games and animated demos don’t work
+reliably out of the box. This isn’t a fundamental limitation — the
+path forward is likely a <code class="docutils literal notranslate"><span class="pre">requestAnimationFrame</span></code>-based tick source
+and better cooperation with the browser compositor — but it needs
+more work. Static and event-driven UIs (calculators, editors,
+viewers, form-based tools) are unaffected.</p></li>
+<li><p><strong>Dynamic side-module deps</strong> (e.g. openblas as a runtime <code class="docutils literal notranslate"><span class="pre">.so</span></code>) — not
+yet supported. The runner only knows about the app’s own artifacts.</p></li>
+<li><p><strong>Only <code class="docutils literal notranslate"><span class="pre">.tar.bz2</span></code></strong> — <code class="docutils literal notranslate"><span class="pre">.conda</span></code> format (zstd-inside-zip) would need
+additional decoders.</p></li>
+<li><p><strong>Limited Qt module coverage</strong> — the emscripten-forge channel
+currently packages <code class="docutils literal notranslate"><span class="pre">qt6-main</span></code>, <code class="docutils literal notranslate"><span class="pre">qt6-svg</span></code>, <code class="docutils literal notranslate"><span class="pre">qt6-5compat</span></code>,
+<code class="docutils literal notranslate"><span class="pre">qt6-imageformats</span></code>, <code class="docutils literal notranslate"><span class="pre">qt6-webchannel</span></code>, <code class="docutils literal notranslate"><span class="pre">qt6-websockets</span></code> (each in both
+vanilla and <code class="docutils literal notranslate"><span class="pre">-jspi</span></code> variants). Notably <strong>QML / QtQuick
+(<code class="docutils literal notranslate"><span class="pre">qt6-declarative</span></code>) is not yet packaged</strong>, and neither are
+<code class="docutils literal notranslate"><span class="pre">qt6-charts</span></code>, <code class="docutils literal notranslate"><span class="pre">qt6-quick3d</span></code>, <code class="docutils literal notranslate"><span class="pre">qt6-multimedia</span></code>,
+<code class="docutils literal notranslate"><span class="pre">qt6-tools</span></code>, etc. Apps that use those modules need their recipes
+added to the channel first.</p></li>
+</ul>
+</section>
+<section id="source">
+<h2>Source<a class="headerlink" href="#source" title="Link to this heading">#</a></h2>
+<p>Runner source lives at
+<a class="reference external" href="https://github.com/emscripten-forge/recipes/tree/main/docs/qtapp"><code class="docutils literal notranslate"><span class="pre">docs/qtapp/</span></code></a>
+in this repo. Two files: <code class="docutils literal notranslate"><span class="pre">index.html</span></code> and <code class="docutils literal notranslate"><span class="pre">runner.js</span></code>. Deployed alongside
+the rest of the docs via the existing MkDocs build (non-markdown files in
+<code class="docutils literal notranslate"><span class="pre">docs/</span></code> are copied verbatim into the site).</p>
+</section>
+</section>
+
+<div class="section ablog__blog_comments">
+   
+</div>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="package_server.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Package Server</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="../blog/index.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Blog</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item"><div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#available-apps">Available apps</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#deep-links">Deep-links</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#how-it-works">How it works</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#packaging-your-own-qt6-wasm-app-for-the-runner">Packaging your own Qt6-wasm app for the runner</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#reference-recipes">Reference recipes</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#browser-requirements">Browser requirements</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#current-limitations">Current limitations</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#source">Source</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Emscripten-forge maintainers
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2026.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>
