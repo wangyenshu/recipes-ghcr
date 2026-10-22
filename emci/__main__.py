@@ -5,11 +5,12 @@ from .constants import (
     RECIPES_WASM_DIR,
 )
 from .find_recipes_with_changes import find_recipes_with_changes
-from .playwright import changed_recipes_need_playwright
+from .playwright import changed_recipes_need_playwright, recipe_needs_playwright
 from .lint import lint_recipe_file, lint_recipes
 from .upload import extract_channel_from_pkg
 
 import sys
+import json
 import os
 import tempfile
 import shutil
@@ -38,6 +39,7 @@ def ghcr(
     registry: str = typer.Option("ghcr.io/wangyenshu", help="registry namespace the channels live under"),
     source_url: Optional[str] = typer.Option(None, help="repository URL to link the packages to"),
     plain_http: bool = typer.Option(False, help="talk plain HTTP to the registry (local testing only)"),
+    overwrite: bool = typer.Option(False, help="replace packages already published with the same version and build number"),
 ):
     """Push the built packages to an OCI registry and update each channel's repodata.json."""
     from .ghcr import ChannelPublisher
@@ -53,7 +55,7 @@ def ghcr(
         print("No packages to upload")
         return
 
-    publisher = ChannelPublisher(registry, source_url=source_url, plain_http=plain_http)
+    publisher = ChannelPublisher(registry, source_url=source_url, plain_http=plain_http, overwrite=overwrite)
     pushed, failed = publisher.publish(packages)
 
     github_output = os.environ.get("GITHUB_OUTPUT")
@@ -65,6 +67,74 @@ def ghcr(
 
     skipped = sum(1 for _, p in packages if p not in pushed and p not in failed)
     print(f"{len(pushed)} pushed, {skipped} already published, {len(set(failed))} failed")
+    if failed:
+        raise typer.Exit(code=1)
+
+
+# -- copying existing channels to the registry (see emci/seed.py) --------------
+
+SEED_SOURCE = "https://repo.prefix.dev"
+SEED_CHANNELS = "emscripten-forge-4x emscripten-forge-4x-experimental"
+
+
+@upload_app.command()
+def seed_plan(
+    channels: str = typer.Option(SEED_CHANNELS, help="space-separated channel names"),
+    source: str = typer.Option(SEED_SOURCE, help="base URL of the source channels"),
+):
+    """Print the push jobs (JSON) for copying CHANNELS from SOURCE; also written to GITHUB_OUTPUT as `matrix`."""
+    from .seed import plan
+
+    jobs = plan(source, channels.split())
+    matrix = json.dumps({"include": jobs})
+    print(matrix)
+    github_output = os.environ.get("GITHUB_OUTPUT")
+    if github_output:
+        with open(github_output, "a") as f:
+            f.write(f"matrix={matrix}\n")
+
+
+@upload_app.command()
+def seed_push(
+    channel: str,
+    subdir: str,
+    shard: int = typer.Option(0),
+    shards: int = typer.Option(1),
+    out: str = typer.Option("seed-result.json", help="where to write the result for seed-index"),
+    source: str = typer.Option(SEED_SOURCE),
+    registry: str = typer.Option("ghcr.io/wangyenshu"),
+    source_url: Optional[str] = typer.Option(None, help="repository URL to link the packages to"),
+    workers: int = typer.Option(4, help="packages copied in parallel"),
+    plain_http: bool = typer.Option(False, help="local testing only"),
+):
+    """Copy one shard of SOURCE/CHANNEL/SUBDIR to the registry (packages only, no index)."""
+    from .ghcr import ChannelPublisher
+    from .seed import push_shard
+
+    publisher = ChannelPublisher(registry, source_url=source_url, plain_http=plain_http)
+    result = push_shard(publisher, source, channel, subdir, shard, shards, workers=workers)
+    Path(out).write_text(json.dumps(result))
+    print(f"{len(result['records'])} ready to index, {len(result['kept'])} kept from the registry, "
+          f"{len(result['failed'])} failed")
+    if result["failed"]:
+        raise typer.Exit(code=1)
+
+
+@upload_app.command()
+def seed_index(
+    results_dir: str,
+    registry: str = typer.Option("ghcr.io/wangyenshu"),
+    source_url: Optional[str] = typer.Option(None, help="repository URL to link the indexes to"),
+    plain_http: bool = typer.Option(False, help="local testing only"),
+):
+    """Add every package from the seed-push results in RESULTS_DIR to the registry indexes."""
+    from .ghcr import ChannelPublisher
+    from .seed import index
+
+    results = [json.loads(f.read_text()) for f in sorted(Path(results_dir).rglob("*.json"))]
+    print(f"{len(results)} result file(s), {sum(len(r['records']) for r in results)} package(s)")
+    publisher = ChannelPublisher(registry, source_url=source_url, plain_http=plain_http)
+    failed = index(publisher, results)
     if failed:
         raise typer.Exit(code=1)
 
@@ -138,6 +208,57 @@ def update_matplotlib_fontcache(target_branch_name: str):
     from .bot.update_matplotlib_fontcache import update_matplotlib_fontcache
 
     update_matplotlib_fontcache(RECIPES_EMSCRIPTEN_DIR, target_branch_name)
+
+
+def find_named_recipes(root_dir, names):
+    """{recipes subdir: [recipe dir]} for recipe NAMES (space or comma separated)."""
+    wanted = [n for n in names.replace(",", " ").split() if n]
+    found, missing = {}, []
+    for name in wanted:
+        dirs = [Path(root_dir) / "recipes" / subdir / name for subdir in RECIPES_SUBDIR_MAPPING]
+        dirs = [d for d in dirs if (d / "recipe.yaml").is_file()]
+        if not dirs:
+            missing.append(name)
+        for d in dirs:
+            found.setdefault(d.parent.name, []).append(d)
+    if missing:
+        raise typer.BadParameter(f"no recipe named {', '.join(missing)} under recipes/")
+    # same order as the normal build: host-platform recipes first, then emscripten ones
+    return {subdir: found[subdir] for subdir in RECIPES_SUBDIR_MAPPING if subdir in found}
+
+
+@build_app.command()
+def explicit(
+    root_dir,
+    names: str = typer.Argument(..., help="recipe names, space or comma separated"),
+    only: str = typer.Option("all", help="build only recipes from this folder: recipes, recipes_emscripten or all"),
+    skip_existing: str = typer.Option("local", help="rattler-build --skip-existing"),
+):
+    """Build the named recipes (e.g. "suitesparse openjdk8"), whether or not they changed."""
+    for subdir, recipe_dirs in find_named_recipes(root_dir, names).items():
+        if only != "all" and subdir != only:
+            print(f"Skipping {', '.join(d.name for d in recipe_dirs)} ({subdir} not built here)")
+            continue
+        with tempfile.TemporaryDirectory() as tmp_folder_root:
+            tmp_recipes_root = Path(tmp_folder_root) / "recipes" / "recipes_per_platform"
+            for recipe_dir in recipe_dirs:
+                shutil.copytree(recipe_dir, tmp_recipes_root / recipe_dir.name)
+            for legacy in tmp_recipes_root.rglob("recipe_legacy.yaml"):
+                legacy.unlink()
+            print(f"Building {', '.join(d.name for d in recipe_dirs)} from {subdir}")
+            build_with_rattler(
+                recipe=None,
+                recipes_dir=str(tmp_recipes_root),
+                emscripten_wasm32=RECIPES_SUBDIR_MAPPING[subdir] == "emscripten-wasm32",
+                skip_existing=skip_existing,
+            )
+
+
+@build_app.command("explicit-needs-playwright")
+def explicit_needs_playwright(root_dir, names: str):
+    """Print true/false depending on whether the named recipes need playwright."""
+    dirs = [d for ds in find_named_recipes(root_dir, names).values() for d in ds]
+    print("true" if any(recipe_needs_playwright((d / "recipe.yaml").read_text()) for d in dirs) else "false")
 
 
 @build_app.command("needs-playwright")

@@ -3,8 +3,8 @@
 The layout matches what rattler (rattler-build, pixi, mamba via rattler) reads
 from an ``oci://`` channel, e.g. ``oci://ghcr.io/wangyenshu/emscripten-forge-4x``:
 
-* a package ``<name>-<version>-<build>.tar.bz2`` in ``<subdir>`` is the
-  single layer (media type ``application/vnd.conda.package.v1``) of
+* a package ``<name>-<version>-<build>.tar.bz2`` (or ``.conda``) in ``<subdir>`` is the
+  single layer (media type ``application/vnd.conda.package.v1``, ``.v2`` for ``.conda``) of
   ``<registry>/<channel>/<subdir>/<name>:<version>-<build>``
   (``+ ! =`` in the tag are escaped, a leading ``_`` in the name becomes ``zzz_``)
 * the index of a subdir is the layer (``application/vnd.conda.repodata.v1+json``)
@@ -26,7 +26,11 @@ import time
 from collections import defaultdict
 from pathlib import Path
 
-PACKAGE_MEDIA_TYPE = "application/vnd.conda.package.v1"
+# archive extension -> (repodata.json key, OCI layer media type)
+ARCHIVE_TYPES = {
+    ".tar.bz2": ("packages", "application/vnd.conda.package.v1"),
+    ".conda": ("packages.conda", "application/vnd.conda.package.v2"),
+}
 REPODATA_MEDIA_TYPE = "application/vnd.conda.repodata.v1+json"
 SOURCE_ANNOTATION = "org.opencontainers.image.source"
 
@@ -35,12 +39,28 @@ class PublishError(RuntimeError):
     pass
 
 
+class ConflictError(PublishError):
+    """The registry already has this package version with different content."""
+
+
+def archive_type(filename):
+    for ext, kind in ARCHIVE_TYPES.items():
+        if filename.endswith(ext):
+            return ext, kind
+    raise ValueError(f"{filename}: not a conda package (.tar.bz2 or .conda)")
+
+
+def repodata_key(filename):
+    return archive_type(filename)[1][0]
+
+
+def package_media_type(filename):
+    return archive_type(filename)[1][1]
+
+
 def split_package_filename(filename):
-    if not filename.endswith(".tar.bz2"):
-        raise ValueError(
-            f"{filename}: only .tar.bz2 packages are supported (the build uses --package-format tar-bz2)"
-        )
-    name, version, build = filename[: -len(".tar.bz2")].rsplit("-", 2)
+    ext, _ = archive_type(filename)
+    name, version, build = filename[: -len(ext)].rsplit("-", 2)
     return name, version, build
 
 
@@ -90,13 +110,23 @@ def empty_repodata(subdir):
     }
 
 
+NOT_FOUND = ("not found", "manifest_unknown", "name_unknown")
+
+
 class Oras:
-    def __init__(self, plain_http=False):
+    def __init__(self, plain_http=False, attempts=4):
         self.extra = ["--plain-http"] if plain_http else []
+        self.attempts = attempts
 
     def run(self, *args, cwd=None, check=True):
+        """Run oras, retrying failures other than "not found" (rate limits, network)."""
         cmd = ["oras", *args, *self.extra]
-        proc = subprocess.run(cmd, cwd=cwd, capture_output=True, text=True)
+        for attempt in range(1, self.attempts + 1):
+            proc = subprocess.run(cmd, cwd=cwd, capture_output=True, text=True)
+            if proc.returncode == 0 or any(s in proc.stderr.lower() for s in NOT_FOUND):
+                break
+            if attempt < self.attempts:
+                time.sleep(2 ** attempt + random.uniform(0, 2))
         if check and proc.returncode != 0:
             raise PublishError(f"{' '.join(cmd)} failed:\n{proc.stderr.strip()}")
         return proc
@@ -107,7 +137,7 @@ class Oras:
         if proc.returncode == 0:
             return json.loads(proc.stdout)
         stderr = proc.stderr.lower()
-        if any(s in stderr for s in ("not found", "manifest_unknown", "name_unknown")):
+        if any(s in stderr for s in NOT_FOUND):
             return None
         # anything else (auth, network) must not be mistaken for "doesn't exist":
         # that would publish an index without the existing packages
@@ -125,8 +155,12 @@ class Oras:
 
 
 class ChannelPublisher:
-    def __init__(self, registry, source_url=None, plain_http=False, retries=6):
+    def __init__(self, registry, source_url=None, plain_http=False, retries=6, overwrite=False):
+        """`overwrite`: replace a package already in the registry with different content
+        (a rebuild with the same version and build number). Off by default, because
+        anyone who pinned the old file (e.g. in a lock file) gets a hash mismatch."""
         self.registry = registry.rstrip("/")
+        self.overwrite = overwrite
         self.oras = Oras(plain_http=plain_http)
         self.annotations = {SOURCE_ANNOTATION: source_url} if source_url else {}
         self.retries = retries
@@ -158,23 +192,30 @@ class ChannelPublisher:
             print(f"Creating empty {channel}/{subdir}/repodata.json")
             self.push_repodata(channel, subdir, empty_repodata(subdir))
 
-    def add_to_repodata(self, channel, subdir, records):
-        """Merge `records` ({filename: record}) into the subdir's index, verifying the result."""
+    def add_to_repodata(self, channel, subdir, records, info=None):
+        """Merge `records` ({filename: record}) into the subdir's index, verifying the result.
+
+        `info` adds fields to the index's `info` section that it doesn't have yet
+        (e.g. `channel_relations` copied from the source channel).
+        """
+        extra_info = {k: v for k, v in (info or {}).items() if k not in ("subdir", "base_url")}
         for attempt in range(1, self.retries + 1):
             repodata = self.fetch_repodata(channel, subdir) or empty_repodata(subdir)
-            packages = repodata.setdefault("packages", {})
             missing = {
                 fn: rec
                 for fn, rec in records.items()
-                if packages.get(fn, {}).get("sha256") != rec["sha256"]
+                if repodata.get(repodata_key(fn), {}).get(fn, {}).get("sha256") != rec["sha256"]
             }
-            if not missing:
+            info_missing = {k: v for k, v in extra_info.items() if k not in repodata.get("info", {})}
+            if not missing and not info_missing:
                 print(f"{channel}/{subdir}/repodata.json: {len(records)} package(s) indexed")
                 return
             if attempt > 1:
                 print(f"{len(missing)} record(s) missing from {channel}/{subdir}/repodata.json, retrying ({attempt}/{self.retries})")
-            packages.update(missing)
-            repodata.setdefault("info", {})["subdir"] = subdir
+            for fn, rec in missing.items():
+                repodata.setdefault(repodata_key(fn), {})[fn] = rec
+            repodata.setdefault("info", {}).update(info_missing)
+            repodata["info"]["subdir"] = subdir
             self.push_repodata(channel, subdir, repodata)
             # another run may have pushed the same index in the meantime; wait, then verify
             time.sleep(random.uniform(5, 15))
@@ -191,12 +232,16 @@ class ChannelPublisher:
             if f"sha256:{record['sha256']}" in digests:
                 print(f"{pkg_path.name} already published, making sure it is indexed")
                 return False
-            raise PublishError(
+            if self.overwrite:
+                print(f"Replacing {pkg_path.name} (different content, overwrite is on) -> {ref}")
+                self.oras.push(ref, pkg_path, package_media_type(pkg_path.name), self.annotations)
+                return True
+            raise ConflictError(
                 f"{ref} already exists with different content; refusing to overwrite "
                 "(bump the build number instead)"
             )
         print(f"Pushing {pkg_path.name} -> {ref}")
-        self.oras.push(ref, pkg_path, PACKAGE_MEDIA_TYPE, self.annotations)
+        self.oras.push(ref, pkg_path, package_media_type(pkg_path.name), self.annotations)
         return True
 
     def publish(self, packages):
