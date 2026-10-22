@@ -7,6 +7,10 @@ from pathlib import Path
 # the repository the bot opens PRs in (set by GitHub Actions)
 THIS_REPO = os.environ.get("GITHUB_REPOSITORY", "wangyenshu/recipes-ghcr")
 
+# who the bot's commits are attributed to: the owner of BOT_ACCESS_TOKEN
+BOT_GIT_NAME = os.environ.get("BOT_GIT_NAME", "wangyenshu")
+BOT_GIT_EMAIL = os.environ.get("BOT_GIT_EMAIL", "155622798+wangyenshu@users.noreply.github.com")
+
 def find_files_with_changes(old, new):
     # `origin/main...HEAD` shows the unique files changed in HEAD
     # and ignores changes in origin/main after the branch split
@@ -54,11 +58,11 @@ def github_user_ctx(user, email, bypass=False):
 
 @contextmanager
 def bot_github_user_ctx(bypass=False):
-    with github_user_ctx('emscripten-forge-bot', 'emscripten-forge-bot@users.noreply.github.com', bypass=bypass):
+    with github_user_ctx(BOT_GIT_NAME, BOT_GIT_EMAIL, bypass=bypass):
         yield
 
 def set_bot_user():
-    set_git_user('emscripten-forge-bot', 'emscripten-forge-bot@users.noreply.github.com')
+    set_git_user(BOT_GIT_NAME, BOT_GIT_EMAIL)
 
 
 def get_current_branch_name():
