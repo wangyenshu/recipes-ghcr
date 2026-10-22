@@ -1,0 +1,128 @@
+name: Rebuild and upload recipes
+
+# Build the named recipes, whether or not they changed, and upload them to
+# ghcr.io/<owner>/<channel>, the same way a merge to main does.
+
+on:
+  workflow_dispatch:
+    inputs:
+      recipes:
+        description: Recipe names, separated by spaces or commas (e.g. "suitesparse openjdk8 openjdk21 openjdk-tools")
+        required: true
+        type: string
+      overwrite:
+        description: Replace packages already on ghcr with the same version and build number (breaks lock files that pinned the old ones)
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+  id-token: write      # signing the provenance attestations
+  attestations: write  # storing them on GitHub
+  packages: write      # pushing to ghcr.io with GITHUB_TOKEN
+
+jobs:
+  rebuild:
+    if: github.repository == 'wangyenshu/recipes-ghcr'
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # Linux builds everything and uploads emscripten-wasm32, linux-64 and noarch
+          - os: ubuntu-latest
+            only: all
+            platforms: emscripten-wasm32 linux-64 noarch
+          # macOS only builds the host-platform recipes (recipes/recipes) and uploads osx-arm64
+          - os: macos-latest
+            only: recipes
+            platforms: osx-arm64
+    runs-on: ${{ matrix.os }}
+    env:
+      FORCE_COLOR: 1
+      TARGET_PLATFORM: emscripten-wasm32
+      GITHUB_OWNER: ${{ github.repository_owner }}
+      RECIPES: ${{ inputs.recipes }}
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v7
+
+      - name: Global config
+        shell: bash -el {0}
+        run: git config --global advice.detachedHead false
+
+      - name: Install micromamba
+        uses: mamba-org/setup-micromamba@v3
+        with:
+          environment-file: ci_env.yml
+          init-shell: bash
+          cache-environment: false
+          post-cleanup: "all"
+
+      - name: Detect playwright requirement
+        id: playwright
+        shell: bash -el {0}
+        run: |
+          needed=$(python -m emci build explicit-needs-playwright "$GITHUB_WORKSPACE" "$RECIPES")
+          echo "needed=$needed" >> "$GITHUB_OUTPUT"
+
+      - name: Install playwright dependencies
+        if: runner.os == 'Linux' && steps.playwright.outputs.needed == 'true'
+        run: |
+          sudo apt-get update -y && sudo apt-get install -y  \
+          libwoff1  libvpx9  libevent-2.1-7t64 libopus0 libgstreamer-plugins-base1.0-0 \
+          libgstreamer-gl1.0-0 \
+          libgstreamer-plugins-bad1.0-0 \
+          libflite1 \
+          libavif16 \
+          libharfbuzz-icu0 \
+          libsecret-1-0 \
+          libhyphen0 \
+          libmanette-0.2-0 \
+          libgles2 \
+          gstreamer1.0-libav \
+          libgtk-4-1 \
+          libwayland-server0
+
+      - name: Build recipes
+        shell: bash -el {0}
+        run: python -m emci build explicit "$GITHUB_WORKSPACE" "$RECIPES" --only ${{ matrix.only }}
+
+      - name: Create artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: output-${{ matrix.os }}
+          path: output
+        continue-on-error: true
+
+      - name: Install oras
+        uses: oras-project/setup-oras@v2
+
+      - name: Log in to ghcr.io
+        shell: bash
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | oras login ghcr.io -u "${{ github.actor }}" --password-stdin
+
+      - name: Upload packages to ghcr.io
+        id: upload
+        shell: bash -el {0}
+        env:
+          PLATFORMS: ${{ matrix.platforms }}
+          OVERWRITE: ${{ inputs.overwrite }}
+        run: |
+          args=()
+          for platform in $PLATFORMS; do
+            args+=(--platform "$platform")
+          done
+          if [ "$OVERWRITE" = "true" ]; then
+            args+=(--overwrite)
+          fi
+          OWNER=$(echo "$GITHUB_OWNER" | tr "[:upper:]" "[:lower:]")
+          python -m emci upload ghcr "${GITHUB_WORKSPACE}/output" "${args[@]}" \
+            --registry "ghcr.io/${OWNER}" \
+            --source-url "${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}"
+
+      - name: Attest package provenance
+        if: ${{ !cancelled() && steps.upload.outputs.pushed != '' }}
+        uses: actions/attest@v4
+        with:
+          subject-path: ${{ steps.upload.outputs.pushed }}

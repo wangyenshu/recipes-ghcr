@@ -1,0 +1,130 @@
+name: Copy channels to ghcr.io
+
+# One-off (re-runnable) copy of existing channels, e.g. from prefix.dev, to
+# ghcr.io/<owner>/<channel>. Packages already on ghcr with the same content are
+# skipped, so running it again only fills in what is missing.
+
+on:
+  workflow_dispatch:
+    inputs:
+      channels:
+        description: Channels to copy (space-separated)
+        type: string
+        default: emscripten-forge-4x emscripten-forge-4x-experimental
+      source:
+        description: Base URL the channels are copied from
+        type: string
+        default: https://repo.prefix.dev
+
+permissions:
+  contents: read
+  packages: write   # GITHUB_TOKEN pushes, so the packages are linked to this repo and public
+
+concurrency:
+  group: seed-ghcr
+  cancel-in-progress: false
+
+jobs:
+  plan:
+    if: github.repository == 'wangyenshu/recipes-ghcr'
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.plan.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: mamba-org/setup-micromamba@v3
+        with:
+          environment-file: ci_env.yml
+          init-shell: bash
+          cache-environment: true
+
+      - name: Split the channels into jobs
+        id: plan
+        shell: bash -el {0}
+        env:
+          CHANNELS: ${{ inputs.channels }}
+          SOURCE: ${{ inputs.source }}
+        run: python -m emci upload seed-plan --channels "$CHANNELS" --source "$SOURCE"
+
+  push:
+    needs: plan
+    name: copy ${{ matrix.channel }}/${{ matrix.subdir }} (${{ matrix.shard }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    strategy:
+      fail-fast: false
+      max-parallel: 6
+      matrix: ${{ fromJSON(needs.plan.outputs.matrix) }}
+    env:
+      CHANNEL: ${{ matrix.channel }}
+      SUBDIR: ${{ matrix.subdir }}
+      SHARD: ${{ matrix.shard }}
+      SHARDS: ${{ matrix.shards }}
+      SOURCE: ${{ inputs.source }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: mamba-org/setup-micromamba@v3
+        with:
+          environment-file: ci_env.yml
+          init-shell: bash
+          cache-environment: true
+
+      - uses: oras-project/setup-oras@v2
+
+      - name: Log in to ghcr.io
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | oras login ghcr.io -u "${{ github.actor }}" --password-stdin
+
+      - name: Copy packages
+        shell: bash -el {0}
+        run: |
+          OWNER=$(echo "$GITHUB_REPOSITORY_OWNER" | tr "[:upper:]" "[:lower:]")
+          python -m emci upload seed-push "$CHANNEL" "$SUBDIR" \
+            --shard "$SHARD" --shards "$SHARDS" \
+            --out "seed-${CHANNEL}-${SUBDIR}-${SHARD}.json" \
+            --source "$SOURCE" \
+            --registry "ghcr.io/${OWNER}" \
+            --source-url "${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}"
+
+      # kept even when some packages failed, so the index step adds the ones that worked
+      - name: Save the result for the index step
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: seed-${{ matrix.channel }}-${{ matrix.subdir }}-${{ matrix.shard }}
+          path: seed-*.json
+          if-no-files-found: ignore
+
+  index:
+    needs: [plan, push]
+    if: ${{ !cancelled() && needs.plan.result == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: mamba-org/setup-micromamba@v3
+        with:
+          environment-file: ci_env.yml
+          init-shell: bash
+          cache-environment: true
+
+      - uses: oras-project/setup-oras@v2
+
+      - name: Log in to ghcr.io
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | oras login ghcr.io -u "${{ github.actor }}" --password-stdin
+
+      - uses: actions/download-artifact@v8
+        with:
+          pattern: seed-*
+          path: seed-results
+          merge-multiple: true
+
+      - name: Add the copied packages to each channel's repodata.json
+        shell: bash -el {0}
+        run: |
+          OWNER=$(echo "$GITHUB_REPOSITORY_OWNER" | tr "[:upper:]" "[:lower:]")
+          mkdir -p seed-results
+          python -m emci upload seed-index seed-results \
+            --registry "ghcr.io/${OWNER}" \
+            --source-url "${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}"

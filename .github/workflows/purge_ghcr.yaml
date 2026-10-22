@@ -1,0 +1,169 @@
+name: Purge ghcr.io channels
+
+# Deletes every ghcr.io package that belongs to the given channels:
+# ghcr.io/<owner>/<channel>/<subdir>/<package> and each subdir's repodata.json.
+# Other packages of the owner are never touched.
+# Without typing DELETE in `confirm`, it only lists what it would delete.
+#
+# GITHUB_TOKEN can delete packages that this repository's workflows published
+# (the build, rebuild and copy workflows). For packages pushed some other way,
+# add a classic token with the read:packages and delete:packages scopes as the
+# PACKAGES_TOKEN secret; it is used instead of GITHUB_TOKEN when it exists.
+
+on:
+  workflow_dispatch:
+    inputs:
+      channels:
+        description: Channels to purge (space-separated)
+        type: string
+        default: emscripten-forge-4x emscripten-forge-4x-experimental
+      confirm:
+        description: Type DELETE to delete. Anything else only lists what would be deleted.
+        type: string
+        default: ""
+
+permissions:
+  contents: read
+  packages: write
+
+concurrency:
+  group: purge-ghcr
+  cancel-in-progress: false
+
+jobs:
+  purge:
+    if: github.repository == 'wangyenshu/recipes-ghcr'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Delete the channel packages
+        env:
+          GH_TOKEN: ${{ secrets.PACKAGES_TOKEN || secrets.GITHUB_TOKEN }}
+          OWNER: ${{ github.repository_owner }}
+          OWNER_TYPE: ${{ github.event.repository.owner.type }}
+          CHANNELS: ${{ inputs.channels }}
+          CONFIRM: ${{ inputs.confirm }}
+        run: |
+          python3 - <<'PY'
+          import json, os, sys, time, urllib.error, urllib.parse, urllib.request
+
+          OWNER = os.environ["OWNER"].lower()
+          BASE = ("/orgs/" if os.environ.get("OWNER_TYPE") == "Organization" else "/users/") + OWNER
+          API = os.environ.get("GITHUB_API_URL", "https://api.github.com")
+          REGISTRY = os.environ.get("REGISTRY_URL", "https://ghcr.io")
+          TOKEN = os.environ["GH_TOKEN"]
+          CHANNELS = os.environ["CHANNELS"].split()
+          DELETE = os.environ.get("CONFIRM", "").strip() == "DELETE"
+          SUBDIRS = ["emscripten-wasm32", "noarch", "linux-64", "linux-aarch64", "osx-64", "osx-arm64", "win-64"]
+
+          class NoRedirect(urllib.request.HTTPRedirectHandler):
+              def redirect_request(self, *args, **kwargs):
+                  return None
+
+          opener = urllib.request.build_opener(NoRedirect)
+
+          def http(method, url, headers=None):
+              request = urllib.request.Request(url, method=method, headers=headers or {})
+              try:
+                  with opener.open(request, timeout=60) as r:
+                      return r.status, r.read(), r.headers
+              except urllib.error.HTTPError as e:
+                  return e.code, e.read(), e.headers
+
+          def api(method, path):
+              headers = {"Authorization": f"Bearer {TOKEN}", "Accept": "application/vnd.github+json",
+                         "X-GitHub-Api-Version": "2022-11-28"}
+              for attempt in range(8):
+                  status, body, h = http(method, API + path, headers)
+                  limited = status == 429 or (status == 403 and b"rate limit" in body.lower())
+                  if not limited and status < 500:
+                      return status, body
+                  wait = int(h.get("Retry-After") or 0) or min(60, 2 ** attempt)
+                  print(f"  {status} from the API, waiting {wait}s")
+                  time.sleep(wait)
+              return status, body
+
+          def oci_name(name):
+              return f"zzz{name}" if name.startswith("_") else name
+
+          def package_name(filename):
+              for ext in (".tar.bz2", ".conda"):
+                  if filename.endswith(ext):
+                      return oci_name(filename[: -len(ext)].rsplit("-", 2)[0])
+              return None
+
+          def registry_index(channel, subdir):
+              """The channel's repodata.json on ghcr (anonymous read), or None."""
+              repo = f"{OWNER}/{channel}/{subdir}/repodata.json"
+              status, body, _ = http("GET", f"{REGISTRY}/token?scope=repository:{repo}:pull")
+              if status != 200:
+                  return None
+              auth = {"Authorization": f"Bearer {json.loads(body)['token']}"}
+              status, body, _ = http("GET", f"{REGISTRY}/v2/{repo}/manifests/latest",
+                                     {**auth, "Accept": "application/vnd.oci.image.manifest.v1+json"})
+              if status != 200:
+                  return None
+              digest = json.loads(body)["layers"][0]["digest"]
+              status, body, h = http("GET", f"{REGISTRY}/v2/{repo}/blobs/{digest}", auth)
+              if status in (301, 302, 303, 307, 308):   # blobs are served from a signed URL
+                  status, body, _ = http("GET", h["Location"])
+              return json.loads(body) if status == 200 else None
+
+          # 1. packages named in the channel indexes
+          names = set()
+          for channel in CHANNELS:
+              for subdir in SUBDIRS:
+                  index = registry_index(channel, subdir)
+                  if index is None:
+                      continue
+                  names.add(f"{channel}/{subdir}/repodata.json")
+                  for key in ("packages", "packages.conda"):
+                      for filename in index.get(key, {}):
+                          if package_name(filename):
+                              names.add(f"{channel}/{subdir}/{package_name(filename)}")
+
+          # 2. packages GitHub lists for the owner (also finds ones missing from an index)
+          page, listed = 1, True
+          while True:
+              status, body = api("GET", f"{BASE}/packages?package_type=container&per_page=100&page={page}")
+              if status != 200:
+                  listed = False
+                  print(f"Could not list packages (HTTP {status}); using the channel indexes only")
+                  break
+              batch = json.loads(body)
+              names.update(p["name"] for p in batch if any(p["name"].startswith(f"{c}/") for c in CHANNELS))
+              if len(batch) < 100:
+                  break
+              page += 1
+
+          # indexes first, so clients stop seeing packages while they are being deleted
+          ordered = sorted(names, key=lambda n: (not n.endswith("/repodata.json"), n))
+          for channel in CHANNELS:
+              print(f"{channel}: {sum(n.startswith(channel + '/') for n in ordered)} package(s)")
+          if not DELETE:
+              for name in ordered[:50]:
+                  print(f"  would delete {name}")
+              if len(ordered) > 50:
+                  print(f"  ... and {len(ordered) - 50} more")
+              print(f"Dry run: {len(ordered)} package(s) would be deleted. Run again with confirm = DELETE to delete them.")
+              sys.exit(0)
+
+          deleted, gone, refused = 0, 0, []
+          for i, name in enumerate(ordered, 1):
+              status, body = api("DELETE", f"{BASE}/packages/container/{urllib.parse.quote(name, safe='')}")
+              if status == 204:
+                  deleted += 1
+              elif status == 404:
+                  gone += 1
+              else:
+                  refused.append(name)
+                  print(f"  {name}: HTTP {status} {body[:200].decode(errors='replace')}")
+              if i % 50 == 0 or i == len(ordered):
+                  print(f"{i}/{len(ordered)}: {deleted} deleted, {gone} already gone, {len(refused)} refused")
+              time.sleep(0.5)   # stay under GitHub's limits on write requests
+
+          if refused:
+              print(f"{len(refused)} package(s) could not be deleted. If they were not published by this repository's "
+                    "workflows, add a PACKAGES_TOKEN secret (classic token with read:packages and delete:packages).")
+              sys.exit(1)
+          print("Done. Deleted packages can be restored from the package settings for 30 days.")
+          PY
