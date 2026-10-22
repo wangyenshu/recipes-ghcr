@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
     inputs:
       recipes:
-        description: Recipe names, separated by spaces or commas (e.g. "suitesparse openjdk8 openjdk21 openjdk-tools")
+        description: Recipe names, separated by spaces or commas
         required: true
         type: string
       overwrite:
