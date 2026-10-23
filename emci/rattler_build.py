@@ -2,7 +2,8 @@ import platform
 import os
 import subprocess
 from pathlib import Path
-from .constants import RATTLER_CONDA_BUILD_CONFIG_PATH
+from .constants import RATTLER_CONDA_BUILD_CONFIG_PATH, DEFAULT_EMSCRIPTEN_FORGE_CHANNEL
+from . import ghcr_bridge
 
 
 def build_with_rattler(recipe=None, recipes_dir=None, emscripten_wasm32=False, skip_existing="local"):
@@ -31,19 +32,21 @@ def build_with_rattler(recipe=None, recipes_dir=None, emscripten_wasm32=False, s
 
     cmd.extend(["-m", RATTLER_CONDA_BUILD_CONFIG_PATH])
 
-    # add conda forge and emscripten-forge channels
-    cmd.extend([
-        "-c", "https://repo.prefix.dev/emscripten-forge-4x",
-        "-c", "microsoft",
-        "-c", "conda-forge",
-        "-c", "bioconda"
-    ])
+    # emscripten-forge packages come from ghcr.io/<owner>/emscripten-forge-4x, which
+    # rattler-build can't read directly (no oci:// support), so it goes through a
+    # local relay that serves the ghcr channel over plain HTTP while the build runs
+    with ghcr_bridge.running() as relay:
+        cmd.extend([
+            "-c", f"{relay}/{DEFAULT_EMSCRIPTEN_FORGE_CHANNEL}",
+            "-c", "microsoft",
+            "-c", "conda-forge",
+            "-c", "bioconda"
+        ])
 
-    # pass existing env vars to subprocess
-    print(f"Running rattler-build with command: {cmd}")
+        print(f"Running rattler-build with command: {cmd}")
+        print(f"(channel {DEFAULT_EMSCRIPTEN_FORGE_CHANNEL} is relayed from oci://ghcr.io/{ghcr_bridge.default_namespace()}/{DEFAULT_EMSCRIPTEN_FORGE_CHANNEL})")
 
-
-    ret = subprocess.run(' '.join(cmd), check=False, shell=True)#, env=os.environ)
+        ret = subprocess.run(' '.join(cmd), check=False, shell=True, env=ghcr_bridge.child_env())
     if ret.returncode != 0:
         raise RuntimeError(f"rattler-build failed with return code {ret.returncode}")
 
