@@ -287,9 +287,9 @@ extra:
 Build the recipe with rattler-build:
 
 ```bash
-rattler-build build \
+python -m emci.ghcr_bridge run -- rattler-build build \
   --package-format tar-bz2 \
-  -c https://repo.prefix.dev/emscripten-forge-4x \
+  -c http://127.0.0.1:8123/emscripten-forge-4x \
   -c microsoft \
   -c conda-forge \
   --target-platform emscripten-wasm32 \
