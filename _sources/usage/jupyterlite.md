@@ -28,12 +28,15 @@ To load a xeus-python kernel with a custom environment, create an environment.ya
 ```yaml
 name: xeus-lite-wasm
 channels:
-  - https://repo.prefix.dev/emscripten-forge-4x
-  - https://repo.prefix.dev/conda-forge
+  - oci://ghcr.io/wangyenshu/emscripten-forge-4x
+  - conda-forge
 dependencies:
   - xeus-python
   - numpy
 ```
+
+`jupyterlite_xeus` installs these packages with micromamba, which needs to be version 2.0 or later
+to read the `oci://` channel.
 
 To build JupyterLite, run the following command where environment.yaml is the path to the file you just created
 
@@ -41,14 +44,20 @@ To build JupyterLite, run the following command where environment.yaml is the pa
 jupyter lite build --XeusAddon.environment_file=some_path/to/environment.yaml
 ```
 
+```{note}
+The packages are downloaded when the site is built and are served with it.
+Installing more emscripten-forge packages from inside a running notebook doesn't work with
+this channel, because browsers can't download from ghcr.io; add them to the environment file instead.
+```
+
 ### From prefix
 Create a environment with the desired packages. Here is an example with numpy as a additional dependency
 
 ```bash
-micromamba create
+micromamba create \
     -n myenv \
     --platform=emscripten-wasm32 \
-    -c https://repo.mamba.pm/emscripten-forge \
+    -c oci://ghcr.io/wangyenshu/emscripten-forge-4x \
     -c conda-forge \
     --yes \
     "python>=3.11"  numpy pandas xeus-python
