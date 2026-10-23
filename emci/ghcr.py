@@ -32,6 +32,16 @@ ARCHIVE_TYPES = {
     ".conda": ("packages.conda", "application/vnd.conda.package.v2"),
 }
 REPODATA_MEDIA_TYPE = "application/vnd.conda.repodata.v1+json"
+
+# micromamba (libmamba) looks for a compressed and a sharded index as their own
+# repositories next to <subdir>/repodata.json. On ghcr.io a repository that doesn't
+# exist answers 403 (no token) instead of 404, and micromamba then gives up on the
+# whole channel ("Subdir ... noarch not loaded!"). So each subdir gets these two
+# repositories with only a `placeholder` tag: the token is granted, `latest` is a
+# plain 404, and micromamba falls back to repodata.json.
+PROBE_REPOSITORIES = ("repodata.json.zst", "repodata_shards.msgpack.zst")
+PLACEHOLDER_TAG = "placeholder"
+PLACEHOLDER_MEDIA_TYPE = "application/vnd.conda.placeholder.v1+json"
 SOURCE_ANNOTATION = "org.opencontainers.image.source"
 
 
@@ -164,6 +174,7 @@ class ChannelPublisher:
         self.oras = Oras(plain_http=plain_http)
         self.annotations = {SOURCE_ANNOTATION: source_url} if source_url else {}
         self.retries = retries
+        self._probes_checked = set()
 
     # -- repodata ---------------------------------------------------------
 
@@ -186,11 +197,26 @@ class ChannelPublisher:
                 self.annotations,
             )
 
+    def ensure_probe_placeholders(self, channel, subdir):
+        """Create the PROBE_REPOSITORIES for `subdir` if they don't exist yet (see above)."""
+        if (channel, subdir) in self._probes_checked:
+            return
+        for probe in PROBE_REPOSITORIES:
+            ref = f"{self.registry}/{channel}/{subdir}/{probe}:{PLACEHOLDER_TAG}"
+            if self.oras.manifest(ref) is None:
+                print(f"Creating {channel}/{subdir}/{probe} placeholder (for micromamba)")
+                with tempfile.TemporaryDirectory() as tmp:
+                    path = Path(tmp) / "placeholder.json"
+                    path.write_text("{}")
+                    self.oras.push(ref, path, PLACEHOLDER_MEDIA_TYPE, self.annotations)
+        self._probes_checked.add((channel, subdir))
+
     def ensure_subdir(self, channel, subdir):
         """Create an empty index for `subdir` if there is none (clients need `noarch`)."""
         if self.fetch_repodata(channel, subdir) is None:
             print(f"Creating empty {channel}/{subdir}/repodata.json")
             self.push_repodata(channel, subdir, empty_repodata(subdir))
+        self.ensure_probe_placeholders(channel, subdir)
 
     def add_to_repodata(self, channel, subdir, records, info=None):
         """Merge `records` ({filename: record}) into the subdir's index, verifying the result.
@@ -199,6 +225,7 @@ class ChannelPublisher:
         (e.g. `channel_relations` copied from the source channel).
         """
         extra_info = {k: v for k, v in (info or {}).items() if k not in ("subdir", "base_url")}
+        self.ensure_probe_placeholders(channel, subdir)
         for attempt in range(1, self.retries + 1):
             repodata = self.fetch_repodata(channel, subdir) or empty_repodata(subdir)
             missing = {
