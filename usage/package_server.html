@@ -9,12 +9,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 <meta property="og:title" content="Package Server" />
 <meta property="og:type" content="website" />
-<meta property="og:url" content="https://emscripten-forge.org/usage/package_server.html" />
+<meta property="og:url" content="https://wangyenshu.github.io/recipes-ghcr/usage/package_server.html" />
 <meta property="og:site_name" content="Emscripten-forge" />
 <meta property="og:description" content="Conda packages and recipes for the emscripten-wasm32 and emscripten-wasm64 WebAssembly platforms." />
-<meta property="og:image" content="https://emscripten-forge.org/_static/og_image.png" />
+<meta property="og:image" content="https://wangyenshu.github.io/recipes-ghcr/_static/og_image.png" />
 <meta property="og:image:alt" content="Emscripten-forge" />
-<meta name="description" content="Emscripten-forge packages are hosted on the GitHub Container Registry as an OCI conda channel: oci://ghcr.io/emscripten-forge/emscripten-forge-4x." />
+<meta name="description" content="Emscripten-forge packages are hosted on the GitHub Container Registry as an OCI conda channel: oci://ghcr.io/wangyenshu/emscripten-forge-4x." />
 
     <title>Package Server &#8212; Emscripten-forge</title>
   
@@ -234,7 +234,7 @@
 <div class="article-header-buttons">
 
 
-<a href="https://github.com/emscripten-forge/recipes" target="_blank"
+<a href="https://github.com/wangyenshu/recipes-ghcr" target="_blank"
    class="btn btn-sm btn-source-repository-button"
    title="Source repository"
    data-bs-placement="bottom" data-bs-toggle="tooltip"
@@ -356,13 +356,13 @@
                 <article class="bd-article">
                    <section id="package-server">
 <h1>Package Server<a class="headerlink" href="#package-server" title="Link to this heading">#</a></h1>
-<p>Emscripten-forge packages are hosted on the <a class="reference external" href="https://github.com/orgs/emscripten-forge/packages?repo_name=recipes">GitHub Container Registry</a>
-as an OCI conda channel: <code class="docutils literal notranslate"><span class="pre">oci://ghcr.io/emscripten-forge/emscripten-forge-4x</span></code>.</p>
+<p>Emscripten-forge packages are hosted on the <a class="reference external" href="https://github.com/wangyenshu?tab=packages&amp;repo_name=recipes-ghcr">GitHub Container Registry</a>
+as an OCI conda channel: <code class="docutils literal notranslate"><span class="pre">oci://ghcr.io/wangyenshu/emscripten-forge-4x</span></code>.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>To use emscripten-forge conda packages, you need to add the <code class="docutils literal notranslate"><span class="pre">emscripten-forge</span></code> channel to your conda configuration or use the <code class="docutils literal notranslate"><span class="pre">--channel</span></code> flag when installing packages, ie:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>micromamba<span class="w"> </span>create<span class="w"> </span>-n<span class="w"> </span>myenv<span class="w"> </span>--platform<span class="o">=</span>emscripten-wasm32<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>-c<span class="w"> </span>oci://ghcr.io/emscripten-forge/emscripten-forge-4x<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>-c<span class="w"> </span>oci://ghcr.io/wangyenshu/emscripten-forge-4x<span class="w"> </span><span class="se">\</span>
 <span class="w">    </span>-c<span class="w"> </span>conda-forge<span class="w"> </span><span class="se">\</span>
 <span class="w">    </span>python<span class="w"> </span>numpy
 </pre></div>

@@ -9,7 +9,7 @@ To install packages from this channel, use the following command:
 ```bash
 micromamba create -n my-channel-name \
     --platform=emscripten-wasm32 \
-    -c oci://ghcr.io/emscripten-forge/emscripten-forge-4x \
+    -c oci://ghcr.io/wangyenshu/emscripten-forge-4x \
     -c conda-forge \
     --yes \
     python numpy scipy matplotlib

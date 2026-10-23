@@ -9,10 +9,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 <meta property="og:title" content="JAVA" />
 <meta property="og:type" content="website" />
-<meta property="og:url" content="https://emscripten-forge.org/usage/java.html" />
+<meta property="og:url" content="https://wangyenshu.github.io/recipes-ghcr/usage/java.html" />
 <meta property="og:site_name" content="Emscripten-forge" />
 <meta property="og:description" content="Conda packages and recipes for the emscripten-wasm32 and emscripten-wasm64 WebAssembly platforms." />
-<meta property="og:image" content="https://emscripten-forge.org/_static/og_image.png" />
+<meta property="og:image" content="https://wangyenshu.github.io/recipes-ghcr/_static/og_image.png" />
 <meta property="og:image:alt" content="Emscripten-forge" />
 <meta name="description" content="We provide openjdk21 and openjdk8 packages in emscripten-forge that allow running unmodified.jar executables and java applets in the browser, without a Java server. openjdk21 recipe documentation::..." />
 
@@ -234,7 +234,7 @@
 <div class="article-header-buttons">
 
 
-<a href="https://github.com/emscripten-forge/recipes" target="_blank"
+<a href="https://github.com/wangyenshu/recipes-ghcr" target="_blank"
    class="btn btn-sm btn-source-repository-button"
    title="Source repository"
    data-bs-placement="bottom" data-bs-toggle="tooltip"
@@ -380,7 +380,7 @@
 <h2>openjdk21 recipe documentation:<a class="headerlink" href="#openjdk21-recipe-documentation" title="Link to this heading">#</a></h2>
 <p>Create one environment with the tools (<code class="docutils literal notranslate"><span class="pre">openjdk21-wasm-link</span></code> and the Emscripten
 toolchain it uses), and one with the JVM:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nv">CH</span><span class="o">=</span><span class="s2">"-c oci://ghcr.io/emscripten-forge/emscripten-forge-4x -c conda-forge"</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nv">CH</span><span class="o">=</span><span class="s2">"-c oci://ghcr.io/wangyenshu/emscripten-forge-4x -c conda-forge"</span>
 micromamba<span class="w"> </span>create<span class="w"> </span>-y<span class="w"> </span>-n<span class="w"> </span>env_tools<span class="w"> </span><span class="nv">$CH</span><span class="w"> </span>openjdk-tools
 micromamba<span class="w"> </span>activate<span class="w"> </span>env_tools
 micromamba<span class="w"> </span>create<span class="w"> </span>-y<span class="w"> </span>-p<span class="w"> </span>./jdk21env<span class="w"> </span>--platform<span class="w"> </span>emscripten-wasm32<span class="w"> </span><span class="nv">$CH</span><span class="w"> </span>openjdk21
@@ -509,7 +509,7 @@ Node.js, like the <code class="docutils literal notranslate"><span class="pre">j
 programs.</p>
 <p>Install the package and copy its browser files into one directory on your
 web server:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>micromamba<span class="w"> </span>create<span class="w"> </span>-y<span class="w"> </span>-p<span class="w"> </span>./jdk8env<span class="w"> </span>--platform<span class="w"> </span>emscripten-wasm32<span class="w"> </span>-c<span class="w"> </span>oci://ghcr.io/emscripten-forge/emscripten-forge-4x<span class="w"> </span>-c<span class="w"> </span>conda-forge<span class="w"> </span>openjdk8
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>micromamba<span class="w"> </span>create<span class="w"> </span>-y<span class="w"> </span>-p<span class="w"> </span>./jdk8env<span class="w"> </span>--platform<span class="w"> </span>emscripten-wasm32<span class="w"> </span>-c<span class="w"> </span>oci://ghcr.io/wangyenshu/emscripten-forge-4x<span class="w"> </span>-c<span class="w"> </span>conda-forge<span class="w"> </span>openjdk8
 ls<span class="w"> </span>jdk8env/share/openjdk8-wasm/
 <span class="c1"># openjdk8-web.js  openjdk8.js  openjdk8.wasm  openjdk8-jre.json  openjdk8-jre.data.gz</span>
 <span class="c1"># openjdk8-javaws.jar</span>
