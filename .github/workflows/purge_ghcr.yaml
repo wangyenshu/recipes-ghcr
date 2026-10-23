@@ -116,6 +116,8 @@ jobs:
                   if index is None:
                       continue
                   names.add(f"{channel}/{subdir}/repodata.json")
+                  # placeholders the upload creates for micromamba (see emci/ghcr.py)
+                  names.update(f"{channel}/{subdir}/{p}" for p in ("repodata.json.zst", "repodata_shards.msgpack.zst"))
                   for key in ("packages", "packages.conda"):
                       for filename in index.get(key, {}):
                           if package_name(filename):
