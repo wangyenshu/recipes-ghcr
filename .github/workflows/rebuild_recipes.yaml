@@ -29,7 +29,7 @@ jobs:
       matrix:
         include:
           # Linux builds everything and uploads emscripten-wasm32, linux-64 and noarch
-          - os: ubuntu-latest
+          - os: ubuntu-24.04   # pinned: ubuntu-latest is moving to Ubuntu 26.04
             only: all
             platforms: emscripten-wasm32 linux-64 noarch
           # macOS only builds the host-platform recipes (recipes/recipes) and uploads osx-arm64
@@ -69,8 +69,11 @@ jobs:
       - name: Install playwright dependencies
         if: runner.os == 'Linux' && steps.playwright.outputs.needed == 'true'
         run: |
-          sudo apt-get update -y && sudo apt-get install -y  \
-          libwoff1  libvpx9  libevent-2.1-7t64 libopus0 libgstreamer-plugins-base1.0-0 \
+          sudo apt-get update -y
+          # libvpx is libvpx9 on Ubuntu 24.04 and libvpx12 on 26.04 (ubuntu-latest is moving to 26.04)
+          VPX=$(apt-cache search --names-only '^libvpx[0-9]+$' | awk '{print $1}' | sort -V | tail -n 1)
+          sudo apt-get install -y  \
+          libwoff1  "$VPX"  libevent-2.1-7t64 libopus0 libgstreamer-plugins-base1.0-0 \
           libgstreamer-gl1.0-0 \
           libgstreamer-plugins-bad1.0-0 \
           libflite1 \
