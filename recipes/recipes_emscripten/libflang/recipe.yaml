@@ -1,6 +1,6 @@
 context:
   name: libflang
-  version: 22.1.7
+  version: 22.1.8
 
 package:
   name: ${{ name }}
@@ -8,7 +8,7 @@ package:
 
 source:
   url: https://github.com/llvm/llvm-project/archive/refs/tags/llvmorg-${{ version }}.tar.gz
-  sha256: da1578ea1faf2050e4b1923fce150b5656db1dbdeda71fe02498ac04f35b03d3
+  sha256: ad18b70e287954c3d62bc7e0b86e7b7af2adf87bcfce21c15fe717f101d7aace
   patches:
     # from https://github.com/serge-sans-paille/llvm-project/tree/feature/flang-wasm
   - patches/0001-Minimal-WASM-support-for-flang.patch
