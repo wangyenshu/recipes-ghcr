@@ -1,6 +1,6 @@
 context:
   name: numcodecs
-  version: 0.16.6
+  version: 0.17.0
 
 package:
   name: ${{ name }}
@@ -8,7 +8,7 @@ package:
 
 source:
 - url: https://pypi.io/packages/source/${{ name[0] }}/${{ name }}/${{ name }}-${{ version }}.tar.gz
-  sha256: 5e446928af7c40b4dc8f51e960b4c9fb14f617846577d2fcf35ae2f92738f00f
+  sha256: e8db2e337bdafd3bb5f891a2543b53b2b36a509ce9d587af2846db3715b6c8b9
   patches:
   - patches/setup.patch
 
