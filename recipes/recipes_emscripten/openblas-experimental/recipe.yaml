@@ -1,6 +1,6 @@
 context:
   name: openblas
-  version: 0.3.36.2dev0
+  version: 0.3.36.3dev0
   commit: 539bb47f020d3278a05805f86c1ac63326b8a3d1
 
 package:
