@@ -1,5 +1,5 @@
 context:
-  version: 9.15.0
+  version: 9.16.1
 
 package:
   name: ipython
@@ -7,7 +7,7 @@ package:
 
 source:
 - url: https://pypi.io/packages/source/i/ipython/ipython-${{ version }}.tar.gz
-  sha256: da2819ce2aa83135257df830660b1176d986c3d2876db24df01974fa955b2756
+  sha256: 5a3d1f9a47ff216d6cf9cf863124f6a2c1a198d1354c546a4d24a370a283b64c
   patches:
   - patches/0001-Patch-asyncio-tornado.patch
 
