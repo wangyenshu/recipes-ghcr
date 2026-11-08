@@ -1,6 +1,6 @@
 context:
   name: less
-  version: '703'
+  version: '704'
 
 package:
   name: ${{ name }}
@@ -8,7 +8,7 @@ package:
 
 source:
   url: https://github.com/gwsw/less/archive/refs/tags/v${{ version }}.tar.gz
-  sha256: 626e01ad769bbe52d31dc75095371cbbdfe9ba8b6f989eb3e10b56bd0f95bce6
+  sha256: 0a801a147af1e41c1d9daa273316ce6d560053534659b5487ed5de6fc5032de4
 
 build:
   number: 0
