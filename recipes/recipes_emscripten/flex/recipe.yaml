@@ -1,6 +1,6 @@
 context:
   name: flex
-  version: 2.6.7
+  version: 2.6.8
 
 package:
   name: ${{ name }}
@@ -8,7 +8,7 @@ package:
 
 source:
   url: https://github.com/westes/flex/releases/download/v${{ version }}/flex-${{ version }}.tar.gz
-  sha256: b8dbc5625462664d06ac028791e465ae23e0dc8a04e014890d366221d37d5008
+  sha256: 2672fda28aacee5e269c9a9bbf4a08a9bc48a21638a8916572014584e2500dc6
 
 build:
   number: 0
